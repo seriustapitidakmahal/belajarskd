@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulasi SKD GRATIS - 50 Soal Pilihan</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --blue-mid: #bfdbfe;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --green-mid: #bbf7d0;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --purple-mid: #ddd6fe;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --amber-mid: #fde68a;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --red-mid: #fecaca;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; }
+button { font-family: inherit; cursor: pointer; }
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+#home { align-items: center; justify-content: center; padding: 2rem 1rem; background: var(--bg); }
+.home-card { background: var(--surface); border-radius: 20px; box-shadow: var(--shadow-md); padding: 2.5rem 2rem; max-width: 560px; width: 100%; text-align: center; }
+.home-logo { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; background: linear-gradient(135deg, #1B6B3A 0%, #2E8B57 100%); border-radius: 16px; color: #fff; font-size: 2.5rem; font-weight: 900; }
+.home-title { font-size: 1.6rem; font-weight: 700; color: var(--text); margin-bottom: .4rem; }
+.home-sub { color: var(--text2); font-size: .93rem; margin-bottom: 1.8rem; line-height: 1.6; }
+.badge { display: inline-block; background: var(--amber-light); border: 1px solid var(--amber-mid); color: #8B6800; font-size: .75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 1rem; }
+.home-btns { display: flex; flex-direction: column; gap: 10px; }
+.btn-primary { background: #1B6B3A; color: #fff; border: none; border-radius: var(--radius-sm); padding: 13px 20px; font-size: .95rem; font-weight: 600; transition: opacity .15s; }
+.btn-primary:hover { opacity: .88; }
+.btn-outline { background: transparent; color: var(--text2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 20px; font-size: .9rem; font-weight: 500; transition: background .15s; }
+.btn-outline:hover { background: var(--surface2); }
+.note-box { background: var(--amber-light); border: 1px solid var(--amber-mid); border-radius: var(--radius-sm); padding: 10px 14px; font-size: .8rem; color: #92400e; text-align: left; margin-top: 1rem; }
+.badge-gratis { display: inline-block; background: var(--green-light); border: 1px solid var(--green-mid); color: var(--green); font-size: .7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-left: 6px; }
+
+#exam { flex-direction: column; }
+.exam-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-size: .82rem; color: var(--text2); }
+.exam-header-left { display: flex; align-items: center; gap: 12px; }
+.subtes-badge { font-size: .72rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.timer-box { background: var(--red-light); border: 1.5px solid var(--red-mid); border-radius: 8px; padding: 5px 14px; display: flex; align-items: center; gap: 6px; }
+.timer-box.warning { background: var(--amber-light); border-color: var(--amber-mid); }
+.timer-box.ok { background: var(--green-light); border-color: var(--green-mid); }
+.timer-num { font-family: 'Fira Mono', monospace; font-size: 1rem; font-weight: 500; color: var(--green); }
+.timer-box.warning .timer-num { color: var(--amber); }
+.timer-box.red .timer-num { color: var(--red); }
+.exam-body { display: flex; gap: 0; flex: 1; }
+.exam-main { flex: 1; padding: 1.5rem; max-width: 680px; }
+.soal-box { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+.soal-num { font-size: .75rem; font-weight: 700; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .5rem; }
+.soal-kategori { display: inline-block; font-size: .7rem; font-weight: 600; padding: 3px 8px; border-radius: 5px; margin-bottom: .8rem; background: var(--blue-light); color: var(--blue); }
+.soal-text { font-size: .95rem; line-height: 1.75; color: var(--text); margin-bottom: 1.2rem; font-weight: 500; }
+.pilihan-list { display: flex; flex-direction: column; gap: 8px; }
+.pilihan { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); cursor: pointer; transition: border-color .15s, background .15s; }
+.pilihan:hover { border-color: var(--blue); background: var(--blue-light); }
+.pilihan.selected { border-color: var(--blue); background: var(--blue-light); }
+.pilihan.correct { border-color: var(--green); background: var(--green-light); }
+.pilihan.wrong { border-color: var(--red); background: var(--red-light); }
+.pilihan-label { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; flex-shrink: 0; }
+.pilihan.selected .pilihan-label { background: var(--blue); border-color: var(--blue); color: #fff; }
+.pilihan.correct .pilihan-label { background: var(--green); border-color: var(--green); color: #fff; }
+.pilihan.wrong .pilihan-label { background: var(--red); border-color: var(--red); color: #fff; }
+.pilihan-text { font-size: .88rem; line-height: 1.6; color: var(--text); padding-top: 2px; }
+.exam-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+.btn-ragu { background: var(--amber-light); color: var(--amber); border: 1.5px solid var(--amber-mid); border-radius: var(--radius-sm); padding: 9px 16px; font-size: .83rem; font-weight: 600; }
+.btn-ragu:hover { background: var(--amber-mid); }
+.nav-btns { display: flex; gap: 8px; }
+.btn-nav { background: var(--surface); border: 1.5px solid var(--border); color: var(--text); border-radius: var(--radius-sm); padding: 9px 18px; font-size: .85rem; font-weight: 600; }
+.btn-nav:hover { background: var(--surface2); }
+.btn-nav.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn-nav.primary:hover { opacity: .88; }
+.exam-sidebar { width: 230px; background: var(--surface); border-left: 1px solid var(--border); padding: 1.2rem; flex-shrink: 0; }
+.sidebar-title { font-size: .75rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+.soal-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 1rem; }
+.soal-dot { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface2); }
+.soal-dot.answered { background: var(--blue); border-color: var(--blue); color: #fff; }
+.soal-dot.current { outline: 3px solid var(--blue); outline-offset: 2px; }
+.sidebar-legend { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.2rem; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: .75rem; color: var(--text2); }
+.legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+.btn-selesai { width: 100%; background: var(--green); color: #fff; border: none; border-radius: var(--radius-sm); padding: 11px; font-size: .88rem; font-weight: 700; margin-top: .5rem; }
+.btn-selesai:hover { opacity: .88; }
+
+#result { padding: 2rem 1rem; align-items: center; }
+.result-wrap { max-width: 640px; width: 100%; }
+.result-header { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.8rem; margin-bottom: 1rem; text-align: center; box-shadow: var(--shadow); }
+.result-title { font-size: 1.3rem; font-weight: 700; margin-bottom: .3rem; }
+.result-sub { color: var(--text2); font-size: .88rem; margin-bottom: 1.4rem; }
+.score-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.2rem; }
+.score-card { border-radius: var(--radius-sm); padding: 14px 12px; text-align: center; }
+.score-val { font-size: 1.5rem; font-weight: 700; margin-bottom: 2px; }
+.score-label { font-size: .75rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.pg-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.2rem; }
+.pg-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 14px; }
+.pg-name { font-size: .83rem; font-weight: 600; width: 90px; flex-shrink: 0; }
+.pg-bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.pg-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+.pg-score { font-size: .83rem; font-weight: 700; width: 60px; text-align: right; flex-shrink: 0; }
+.result-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.result-btns button { flex: 1; min-width: 130px; }
+
+.pembahasan-wrap { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.5rem; margin-top: 1rem; box-shadow: var(--shadow); }
+.pembahasan-wrap h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+.pb-item { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin-bottom: 10px; }
+.pb-item.pb-correct { border-color: var(--green-mid); background: var(--green-light); }
+.pb-item.pb-wrong { border-color: var(--red-mid); background: var(--red-light); }
+.pb-num { font-size: .72rem; font-weight: 700; color: var(--text3); margin-bottom: .3rem; }
+.pb-soal { font-size: .87rem; font-weight: 500; line-height: 1.6; margin-bottom: .6rem; }
+.pb-kunci { font-size: .82rem; margin-bottom: .5rem; }
+.pb-kunci span { font-weight: 700; }
+.pb-tips { font-size: .8rem; background: var(--amber-light); border-left: 3px solid var(--amber); padding: 8px 12px; border-radius: 0 6px 6px 0; color: #78350f; line-height: 1.55; margin-top: 6px; }
+
+@media(max-width:600px) {
+  .exam-body { flex-direction: column; }
+  .exam-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border); }
+  .home-card { padding: 1.8rem 1.5rem; }
+  .harga-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-card">
+    <div class="home-logo">🎓</div>
+    <div class="home-title">Simulasi SKD GRATIS</div>
+    <div class="home-sub">
+      Coba gratis latihan soal Tes Kompetensi Dasar CPNS dengan <strong>50 soal pilihan</strong> 
+      <span class="badge-gratis">GRATIS</span><br>
+      <strong>15 TWK + 15 TIU + 15 TKP</strong> dengan 2 soal figural interaktif
+    </div>
+    <div style="background:var(--blue-light);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;text-align:left;font-size:.85rem;color:var(--text);">
+      <strong>📊 Apa yang akan Anda dapatkan:</strong>
+      <ul style="margin-left:1.2rem;margin-top:.5rem;line-height:1.8;">
+        <li>✓ 50 soal pilihan terpilih dari bank soal lengkap</li>
+        <li>✓ Timer untuk latihan manajemen waktu</li>
+        <li>✓ Pembahasan mendalam setiap soal</li>
+        <li>✓ Soal figural visual (SVG interaktif)</li>
+        <li>✓ Analisis hasil per subtes (TWK/TIU/TKP)</li>
+      </ul>
+    </div>
+    <div class="home-btns">
+      <button class="btn-primary" onclick="startExam()">🚀 Mulai Latihan Sekarang</button>
+      <button class="btn-outline" onclick="showScreen('home')">← Kembali ke BelajarSKD</button>
+    </div>
+    <div class="note-box">
+      💡 <strong>Tips:</strong> Kerjakan semua 50 soal untuk hasil akurat. Jangan lewatkan soal figural!
+    </div>
+  </div>
+</div>
+
+<!-- EXAM -->
+<div id="exam" class="screen">
+  <div class="exam-header">
+    <div class="exam-header-left">
+      <span class="subtes-badge" id="subtesBadge"></span>
+      <span id="progressText"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="timer-box ok" id="timerBox">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="timer-num" id="timerDisplay">45:00</span>
+      </div>
+    </div>
+  </div>
+  <div class="exam-body">
+    <div class="exam-main">
+      <div class="soal-box">
+        <div class="soal-num" id="soalNum"></div>
+        <div class="soal-kategori" id="soalKategori"></div>
+        <div class="soal-text" id="soalText"></div>
+        <div class="pilihan-list" id="pilihanList"></div>
+      </div>
+      <div class="exam-nav">
+        <button class="btn-ragu" onclick="toggleRagu()">🔶 Ragu-ragu</button>
+        <div class="nav-btns">
+          <button class="btn-nav" onclick="prevSoal()">← Sebelumnya</button>
+          <button class="btn-nav primary" id="btnNext" onclick="nextOrFinish()">Selanjutnya →</button>
+        </div>
+      </div>
+    </div>
+    <div class="exam-sidebar">
+      <div class="sidebar-title">Navigasi Soal</div>
+      <div class="soal-grid" id="soalGrid"></div>
+      <div class="sidebar-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue);"></div>Dijawab</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber-light);border:1.5px solid var(--amber);"></div>Ragu-ragu</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--surface2);border:1.5px solid var(--border);"></div>Belum dijawab</div>
+      </div>
+      <button class="btn-selesai" onclick="finishConfirm()">✅ Selesai & Lihat Nilai</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <div class="result-wrap">
+    <div class="result-header">
+      <div class="result-title">📊 Hasil Simulasi SKD GRATIS</div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="score-row" id="scoreRow"></div>
+      <div class="pg-row" id="pgRow"></div>
+      <div class="result-btns">
+        <button class="btn-primary btn-nav" onclick="showPembahasan()">📖 Lihat Pembahasan</button>
+        <button class="btn-outline" onclick="goHome()">🏠 Kembali Beranda</button>
+      </div>
+    </div>
+    <div class="pembahasan-wrap" id="pembahasanWrap" style="display:none;">
+      <h3>📖 Pembahasan & Kunci Jawaban</h3>
+      <div id="pembahasanList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════ 50 SOAL GRATIS (15 TWK + 15 TIU + 15 TKP + 2 FIGURAL) ═══════════
+let bankSoal = [
+  // TWK (15 soal)
+  {id:1,subtes:'TWK',kategori:'Pancasila',soal:'Pancasila sebagai dasar negara Indonesia pertama kali diusulkan secara resmi dalam sidang BPUPKI oleh...',pilihan:{A:'Ir. Soekarno',B:'Moh. Hatta',C:'Sutan Sjahrir',D:'KH Agus Salim',E:'Soepomo'},kunci:'A',bobot:5,pembahasan:'Ir. Soekarno mengusulkan Pancasila pada sidang BPUPKI pertama (29 Mei-1 Juni 1945).',tips:'Tokoh utama Pancasila = Ir. Soekarno'},
+  {id:2,subtes:'TWK',kategori:'UUD 1945',soal:'Pasal yang mengatur bahwa semua warga negara bersamaan kedudukannya di dalam hukum adalah...',pilihan:{A:'Pasal 26',B:'Pasal 27 ayat (1)',C:'Pasal 28',D:'Pasal 29',E:'Pasal 30'},kunci:'B',bobot:5,pembahasan:'Pasal 27 ayat (1) UUD 1945 menyatakan kesamaan kedudukan semua warga di dalam hukum.',tips:'Pasal 27 ayat (1) = kesamaan di muka hukum'},
+  {id:3,subtes:'TWK',kategori:'Sejarah',soal:'Proklamasi Kemerdekaan Indonesia dibacakan pada tanggal...',pilihan:{A:'16 Agustus 1945',B:'17 Agustus 1945',C:'18 Agustus 1945',D:'19 Agustus 1945',E:'20 Agustus 1945'},kunci:'B',bobot:5,pembahasan:'Proklamasi Kemerdekaan Indonesia dibacakan pada 17 Agustus 1945 oleh Soekarno dan Hatta.',tips:'17 Agustus 1945 = Hari Kemerdekaan Indonesia'},
+  {id:4,subtes:'TWK',kategori:'NKRI',soal:'Semboyan Bhinneka Tunggal Ika berasal dari kitab...',pilihan:{A:'Negarakertagama',B:'Sutasoma',C:'Pararaton',D:'Arjunawiwaha',E:'Mahabharata'},kunci:'B',bobot:5,pembahasan:'Bhinneka Tunggal Ika berasal dari kitab Sutasoma yang ditulis oleh Mpu Tantular.',tips:'Sutasoma = Bhinneka Tunggal Ika (berbeda-beda tetapi tetap satu)'},
+  {id:5,subtes:'TWK',kategori:'Wawasan Kebangsaan',soal:'Makna utama sila ke-4 dalam konteks pemerintahan adalah...',pilihan:{A:'Kedaulatan sepenuhnya di tangan presiden',B:'Pengambilan keputusan melalui musyawarah untuk mufakat',C:'Kebebasan individu tanpa batas',D:'Kewenangan parlemen tanpa kontrol',E:'Desentralisasi tanpa koordinasi pusat'},kunci:'B',bobot:5,pembahasan:'Sila ke-4 Pancasila tentang musyawarah untuk mencapai mufakat dalam pengambilan keputusan.',tips:'Sila ke-4 = Demokrasi Pancasila melalui musyawarah'},
+  {id:6,subtes:'TWK',kategori:'Pancasila',soal:'Empat pilar berbangsa dan bernegara Indonesia terdiri dari Pancasila, UUD 1945, NKRI, dan...',pilihan:{A:'Sumpah Pemuda',B:'Proklamasi Kemerdekaan',C:'Bhinneka Tunggal Ika',D:'Bhineka Tunggal Ika',E:'Semboyan nasional'},kunci:'C',bobot:5,pembahasan:'Empat pilar: Pancasila, UUD 1945, NKRI, dan Bhinneka Tunggal Ika.',tips:'4 Pilar = P4 (Inti Konsensus Nasional)'},
+  {id:7,subtes:'TWK',kategori:'UUD 1945',soal:'Lembaga yang berwenang menguji undang-undang terhadap UUD 1945 adalah...',pilihan:{A:'Mahkamah Agung',B:'Komisi Yudisial',C:'Mahkamah Konstitusi',D:'DPR',E:'MPR'},kunci:'C',bobot:5,pembahasan:'Mahkamah Konstitusi berwenang melakukan judicial review atas peraturan perundang-undangan.',tips:'Mahkamah Konstitusi = Judicial Review (Pasal 24C UUD 1945)'},
+  {id:8,subtes:'TWK',kategori:'Sejarah',soal:'Peristiwa Rengasdengklok bertujuan untuk...',pilihan:{A:'Menyusun teks proklamasi',B:'Mendesak Soekarno-Hatta agar segera memproklamasikan kemerdekaan',C:'Mendiskusikan Dasar Negara',D:'Mengadakan perlawanan pertama',E:'Menyelenggarakan konferensi'},kunci:'B',bobot:5,pembahasan:'Rengasdengklok (16 Agustus 1945): Penculikan Soekarno-Hatta oleh golongan muda untuk percepat proklamasi.',tips:'Rengasdengklok = 16 Agustus 1945 (desakan proklamasi)'},
+  {id:9,subtes:'TWK',kategori:'Pancasila',soal:'Nilai persatuan sila ke-3 mengandung makna bahwa...',pilihan:{A:'Semua warga harus budaya yang sama',B:'Perbedaan suku harus dihilangkan',C:'Perbedaan diakui namun tetap bersatu dalam kehidupan berbangsa',D:'Hanya satu suku yang boleh berkuasa',E:'Semua agama harus disamakan'},kunci:'C',bobot:5,pembahasan:'Sila ke-3 Pancasila: Persatuan Indonesia mengakui perbedaan tetapi tetap bersatu.',tips:'Sila ke-3 = Persatuan dalam perbedaan (Bhinneka Tunggal Ika)'},
+  {id:10,subtes:'TWK',kategori:'NKRI',soal:'Berdasarkan UUD 1945, Presiden memegang kekuasaan pemerintahan menurut Pasal...',pilihan:{A:'Pasal 3',B:'Pasal 4 ayat (1)',C:'Pasal 5',D:'Pasal 6',E:'Pasal 7'},kunci:'B',bobot:5,pembahasan:'Pasal 4 ayat (1) UUD 1945: Presiden Republik Indonesia memegang kekuasaan pemerintahan.',tips:'Pasal 4 ayat (1) = Kekuasaan Presiden sebagai Kepala Pemerintahan'},
+  {id:11,subtes:'TWK',kategori:'Sejarah',soal:'Konferensi Asia Afrika (KAA) 1955 menghasilkan...',pilihan:{A:'Deklarasi ASEAN',B:'Dasasila Bandung',C:'Piagam Jakarta',D:'Deklarasi Djuanda',E:'Pernyataan Bersama'},kunci:'B',bobot:5,pembahasan:'KAA 1955 di Bandung menghasilkan Dasasila Bandung (10 Prinsip Koeksistensi Damai).',tips:'KAA 1955 = Dasasila Bandung'},
+  {id:12,subtes:'TWK',kategori:'Wawasan Kebangsaan',soal:'Toleransi antar umat beragama diwujudkan melalui...',pilihan:{A:'Menyamakan semua agama',B:'Menghindari interaksi dengan agama lain',C:'Saling menghormati, memberikan kebebasan beribadah, dan bekerja sama dalam kemasyarakatan',D:'Mengabaikan perbedaan',E:'Memilih satu agama mayoritas'},kunci:'C',bobot:5,pembahasan:'Toleransi beragama diwujudkan dengan saling menghormati, kebebasan beribadah, dan kerja sama.',tips:'Toleransi = Hormat + Kerjasama lintas agama'},
+  {id:13,subtes:'TWK',kategori:'Pancasila',soal:'Nilai persatuan dalam Pancasila tercermin dalam semboyan...',pilihan:{A:'Tut Wuri Handayani',B:'Bhinneka Tunggal Ika',C:'Ing Ngarso Sung Tulodo',D:'Garuda Pancasila',E:'Sumpah Pemuda'},kunci:'B',bobot:5,pembahasan:'Bhinneka Tunggal Ika = berbeda-beda tetapi tetap satu, mencerminkan persatuan dalam keragaman.',tips:'Bhinneka Tunggal Ika = Semboyan Persatuan'},
+  {id:14,subtes:'TWK',kategori:'UUD 1945',soal:'Hak warga negara untuk memperoleh jaminan sosial diatur dalam UUD 1945 Pasal...',pilihan:{A:'Pasal 27',B:'Pasal 28H',C:'Pasal 31',D:'Pasal 33',E:'Pasal 34'},kunci:'B',bobot:5,pembahasan:'Pasal 28H ayat (3) mengatur hak atas jaminan sosial untuk mengembangkan diri.',tips:'Pasal 28H = Hak Jaminan Sosial'},
+  {id:15,subtes:'TWK',kategori:'NKRI',soal:'Dana Alokasi Umum (DAU) bertujuan untuk...',pilihan:{A:'Membiayai proyek infrastruktur saja',B:'Mengurangi kesenjangan fiskal antar daerah',C:'Membiayai gaji pegawai pusat',D:'Membayar utang negara',E:'Investasi luar negeri'},kunci:'B',bobot:5,pembahasan:'DAU dirancang untuk mengurangi kesenjangan fiskal antara pemerintah pusat dan daerah.',tips:'DAU = Alokasi Umum untuk Kesetaraan Fiskal Daerah'},
+
+  // TIU (15 soal - termasuk 2 FIGURAL)
+  {id:16,subtes:'TIU',kategori:'Analogi Verbal',soal:'DOKTER : STETOSKOP = PETANI : ...',pilihan:{A:'Sawah',B:'Padi',C:'Cangkul',D:'Pupuk',E:'Traktor'},kunci:'C',bobot:5,pembahasan:'Dokter menggunakan stetoskop sebagai alat kerja utama. Petani menggunakan cangkul.',tips:'Cari hubungan: siapa → alat kerja apa'},
+  {id:17,subtes:'TIU',kategori:'Deret Angka',soal:'Berapa bilangan berikutnya: 2, 6, 12, 20, 30, ...',pilihan:{A:'40',B:'42',C:'44',D:'46',E:'48'},kunci:'B',bobot:5,pembahasan:'Pola selisih: 4, 6, 8, 10, 12. Berikutnya +12 = 42.',tips:'Cek selisih antar bilangan'},
+  {id:18,subtes:'TIU',kategori:'Silogisme',soal:'Semua pegawai negeri wajib netral. Budi adalah pegawai negeri. Kesimpulan...',pilihan:{A:'Budi boleh pilih partai manapun terbuka',B:'Budi wajib netral',C:'Budi adalah politisi',D:'Budi tidak perlu netral',E:'Tidak dapat disimpulkan'},kunci:'B',bobot:5,pembahasan:'Premis 1: Semua pegawai negeri wajib netral. Premis 2: Budi = pegawai negeri. Kesimpulan: Budi wajib netral.',tips:'Silogisme: Premis Mayor + Premis Minor = Kesimpulan'},
+  {id:19,subtes:'TIU',kategori:'Numerik',soal:'8 pekerja selesaikan proyek dalam 15 hari. Jika 6 pekerja, berapa hari?',pilihan:{A:'18',B:'20',C:'22',D:'24',E:'25'},kunci:'B',bobot:5,pembahasan:'Kerja = pekerja × hari (konstan). 8×15 = 6×x. x=120/6=20 hari.',tips:'Hubungan terbalik: Semakin sedikit pekerja, semakin lama waktu'},
+  {id:20,subtes:'TIU',kategori:'Analogi Verbal',soal:'LAPAR : MAKAN = HAUS : ...',pilihan:{A:'Air',B:'Minum',C:'Dahaga',D:'Tenggorokan',E:'Kolam'},kunci:'B',bobot:5,pembahasan:'Lapar (kebutuhan) diatasi dengan makan (aksi). Haus diatasi dengan minum.',tips:'Kebutuhan → Solusi/Aksi yang memenuhi'},
+  {id:21,subtes:'TIU',kategori:'Logika Verbal',soal:'Jika semua A adalah B, dan beberapa B adalah C, maka...',pilihan:{A:'Semua A adalah C',B:'Beberapa A pasti adalah C',C:'Semua C adalah A',D:'Tidak dapat disimpulkan',E:'Tidak ada A yang C'},kunci:'D',bobot:5,pembahasan:'Dari premis tidak cukup informasi untuk menyimpulkan hubungan A dan C secara pasti.',tips:'Logika: Cek apakah ada informasi cukup untuk menyimpulkan'},
+  {id:22,subtes:'TIU',kategori:'Deret Huruf',soal:'A, C, F, J, O, ...',pilihan:{A:'T',B:'U',C:'V',D:'W',E:'X'},kunci:'B',bobot:5,pembahasan:'Posisi: A=1, C=3, F=6, J=10, O=15, U=21. Selisih: +2,+3,+4,+5,+6.',tips:'Deret posisi huruf: Selisih bertambah 1 setiap suku'},
+  {id:23,subtes:'TIU',kategori:'Numerik',soal:'25% dari 3/4 dari 400 adalah...',pilihan:{A:'60',B:'70',C:'75',D:'80',E:'90'},kunci:'C',bobot:5,pembahasan:'3/4 × 400 = 300. 25% × 300 = 0.25 × 300 = 75.',tips:'Hitung bertahap: Fraksi dulu, baru persentase'},
+  {id:24,subtes:'TIU',kategori:'Silogisme',soal:'Tidak ada mahasiswa yang tidak belajar. Rini adalah mahasiswa. Kesimpulan...',pilihan:{A:'Rini mungkin tidak belajar',B:'Rini pasti belajar',C:'Semua yang belajar adalah mahasiswa',D:'Rini tidak penting belajar',E:'Tidak tahu'},kunci:'B',bobot:5,pembahasan:'Premis 1: Tidak ada mahasiswa yang tidak belajar (=Semua mahasiswa belajar). Rini mahasiswa → Rini belajar.',tips:'Negasi ganda = Afirmasi: Tidak ada yang tidak = Semua'},
+  {id:25,subtes:'TIU',kategori:'Analogi Verbal',soal:'PANAS : API = DINGIN : ...',pilihan:{A:'Salju',B:'Beku',C:'Es',D:'Angin',E:'Udara'},kunci:'C',bobot:5,pembahasan:'Api adalah sumber panas. Es adalah sumber dingin.',tips:'Cari sumber/penyebab: api→panas, es→dingin'},
+  {id:26,subtes:'TIU',kategori:'Deret Angka',soal:'3, 9, 27, 81, ...',pilihan:{A:'162',B:'243',C:'324',D:'216',E:'180'},kunci:'B',bobot:5,pembahasan:'Geometri rasio 3: 81 × 3 = 243.',tips:'Cek apakah deret geometri (dikali konstan) atau aritmetika (ditambah konstan)'},
+  {id:27,subtes:'TIU',kategori:'Numerik',soal:'Rata-rata 5 siswa = 75. Nilai 65 dikoreksi jadi 85. Rata-rata baru...',pilihan:{A:'77',B:'78',C:'79',D:'80',E:'81'},kunci:'C',bobot:5,pembahasan:'Total awal = 75×5=375. Koreksi: +20. Total baru=395. Rata-rata=395/5=79.',tips:'Perubahan total = perubahan 1 nilai ÷ jumlah data'},
+  {id:28,subtes:'TIU',kategori:'Logika Verbal',soal:'Jika hari ini hujan, jalanan basah. Jalanan tidak basah. Kesimpulan...',pilihan:{A:'Hari ini pasti hujan',B:'Hari ini mungkin hujan',C:'Hari ini tidak hujan',D:'Jalanan pasti basah',E:'Tidak dapat disimpulkan'},kunci:'C',bobot:5,pembahasan:'Modus Tollens: Jika P maka Q. Tidak Q → Tidak P. Jadi hari ini tidak hujan.',tips:'Modus Tollens: Negasi akibat → Negasi penyebab'},
+  {id:29,subtes:'TIU',kategori:'Deret Angka',soal:'1, 5, 13, 29, 61, ...',pilihan:{A:'121',B:'123',C:'125',D:'127',E:'129'},kunci:'C',bobot:5,pembahasan:'Pola: ×2+3. 1×2+3=5, 5×2+3=13, 13×2+3=29, 29×2+3=61, 61×2+3=125.',tips:'Jika tidak ketemu beda konstan, coba pola lain seperti ×k+c'},
+  {id:30,subtes:'TIU',kategori:'Figural-Analogi',soal:'Perhatikan pola gambar berikut. Gambar mana yang melanjutkan pola?',pilihan:{A:'Segitiga',B:'Kotak',C:'Lingkaran',D:'Pentagon',E:'Trapesium'},kunci:'B',bobot:5,pembahasan:'Pola: Sisi bertambah 1. Segitiga (3) → Kotak (4) → Pentagon (5)',tips:'Analogi figural: Cari pola perubahan jumlah sisi/bentuk'},figural:true},
+
+  // TKP (15 soal)
+  {id:31,subtes:'TKP',kategori:'Pelayanan Publik',soal:'Warga marah karena pelayanan lambat. Anda...',pilihan:{A:'Minta keluar saat sudah tenang',B:'Dengarkan tenang, minta maaf, jelaskan proses dan tawarkan solusi alternatif',C:'Abaikan karena sudah prosedur',D:'Balas tegas karena bukan kesalahan Anda',E:'Tunggu rekan lain menangani'},kunci:'B',bobot:3,pembahasan:'Dalam menghadapi warga marah, ASN harus tetap profesional: dengarkan, pahami, jelaskan, dan tawarkan solusi.',tips:'Pelayanan publik = Empati + Solusi, bukan pertahanan diri'},
+  {id:32,subtes:'TKP',kategori:'Integritas',soal:'Atasan minta tanda tangani dokumen tidak akurat. Anda...',pilihan:{A:'Tanda tangani karena perintah atasan',B:'Tolak diam-diam tanpa alasan',C:'Minta klarifikasi profesional dan sampaikan kekhawatiran sebelum tanda tangani',D:'Laporkan langsung ke polisi',E:'Diskusi dengan rekan dulu'},kunci:'C',bobot:3,pembahasan:'Integritas ASN: Tidak boleh mengesahkan dokumen tidak akurat, harus sampaikan kekhawatiran profesional.',tips:'Integritas = Tegak lurus prinsip, komunikasi profesional'},
+  {id:33,subtes:'TKP',kategori:'Jejaring Kerja',soal:'Baru pindah ke bagian baru. Langkah pertama...',pilihan:{A:'Tunggu rekan yang menyapa',B:'Fokus kerja saja tanpa bergaul',C:'Perkenalkan diri aktif, dengarkan pengalaman rekan, cari peluang kolaborasi',D:'Abaikan rekan baru',E:'Minta tugas dari atasan saja'},kunci:'C',bobot:3,pembahasan:'Membangun jejaring kerja: Proaktif berkenalan, belajar dari rekan, dan cari area kolaborasi.',tips:'Jejaring Kerja = Inisiatif + Keterbukaan'},
+  {id:34,subtes:'TKP',kategori:'Profesionalisme',soal:'Ada tugas penting deadline besok, Anda tidak enak badan. Anda...',pilihan:{A:'Pulang istirahat penuh',B:'Abaikan kesehatan kerja hingga malam',C:'Selesaikan sambil jaga kesehatan, komunikasikan ke atasan jika ada risiko',D:'Minta cuti seminggu',E:'Suruh orang lain kerjakan'},kunci:'C',bobot:3,pembahasan:'Profesionalisme: Upayakan selesaikan tugas penting, tapi jaga kesehatan dan komunikasikan risiko ke atasan.',tips:'Profesional = Komitmen pada tugas + Tanggung jawab pada kesehatan diri'},
+  {id:35,subtes:'TKP',kategori:'Manajemen Diri',soal:'Banyak tugas prioritas sama dan deadline berdekatan. Anda...',pilihan:{A:'Buat daftar prioritas berdasarkan urgensitas dan dampak, kerjakan secara sistematis',B:'Kerjakan yang paling mudah dulu',C:'Tunda sampai deadline mepet',D:'Minta pindah divisi',E:'Serahkan ke atasan semua'},kunci:'A',bobot:3,pembahasan:'Manajemen diri: Buat prioritas berdasarkan urgensitas dan dampak, lalu kerjakan sistematis.',tips:'Prioritas = Urgent (deadline) + Impact (dampak penting)'},
+  {id:36,subtes:'TKP',kategori:'Jejaring Kerja',soal:'Rekan tidak selesaikan bagiannya berulang kali. Sikap Anda...',pilihan:{A:'Diam dan tutupi kekurangan rekan',B:'Bicara pribadi untuk pahami masalah, tawarkan bantuan atau eskalasi ke atasan jika berkelanjutan',C:'Lapor langsung ke atasan tanpa bicara ke rekan',D:'Kerjakan semua bagian rekan',E:'Menyerah dan anggap tidak penting'},kunci:'B',bobot:3,pembahasan:'Jejaring kerja profesional: Bicara dulu ke rekan, pahami akar masalah, tawarkan solusi, baru eskalasi.',tips:'Komunikasi langsung = Solusi lebih efektif & menjaga hubungan'},
+  {id:37,subtes:'TKP',kategori:'Inovasi',soal:'Anda punya ide memperbaiki proses pelayanan yang lambat. Anda...',pilihan:{A:'Diam karena takut ditolak',B:'Dokumentasikan ide dan sampaikan ke atasan dengan data & rencana implementasi',C:'Langsung terapkan tanpa persetujuan',D:'Tunggu atasan minta ide',E:'Cerita ke rekan semua tapi tidak formal'},kunci:'B',bobot:3,pembahasan:'Inovasi ASN: Dokumentasikan ide dengan evidence, usulkan ke atasan dengan rencana yang matang.',tips:'Inovasi Publik = Ide + Data + Rencana Implementasi'},
+  {id:38,subtes:'TKP',kategori:'Pelayanan Publik',soal:'Masyarakat bingung prosedur. Anda...',pilihan:{A:'Suruh baca papan pengumuman',B:'Lanjutkan pekerjaan karena ada panduan tertulis',C:'Jelaskan prosedur dengan sabar dan jelas, bantu proses bila perlu',D:'Suruh tanya di bagian lain',E:'Abaikan karena bukan tanggung jawab spesifik Anda'},kunci:'C',bobot:3,pembahasan:'Pelayanan publik: Bantu masyarakat memahami prosedur dengan penjelasan yang jelas dan sabar.',tips:'Pelayanan = Solusi, bukan hanya prosedur'},
+  {id:39,subtes:'TKP',kategori:'Disiplin',soal:'Terlambat karena kemacetan. Anda...',pilihan:{A:'Masuk diam-diam berharap tidak diperhatikan',B:'Salahkan kondisi jalan',C:'Lapor ke atasan, minta maaf, pastikan pekerjaan tetap selesai tepat waktu',D:'Kejar waktu dengan mengganggu rekan',E:'Bilang sakit agar alasan diterima'},kunci:'C',bobot:3,pembahasan:'Disiplin ASN: Transparan tentang keterlambatan, tanggung jawab, dan upayakan agar pekerjaan tetap lancar.',tips:'Disiplin = Jujur + Tanggung Jawab + Mitigasi'},
+  {id:40,subtes:'TKP',kategori:'Pengembangan Diri',soal:'Hasil evaluasi kinerja kurang memuaskan. Respons Anda...',pilihan:{A:'Merasa tersinggung dan anggap tidak adil',B:'Bicarakan ketidaksetujuan dengan atasan sampai marah',C:'Dengarkan feedback, pahami kelemahan, dan buat rencana perbaikan',D:'Abaikan evaluasi',E:'Minta kenaikan gaji meski kinerjanya kurang'},kunci:'C',bobot:3,pembahasan:'Pengembangan diri: Terima feedback dengan terbuka, identifikasi area perbaikan, dan buat action plan.',tips:'Feedback = Kesempatan berkembang, bukan kritik pribadi'},
+  {id:41,subtes:'TKP',kategori:'Pelayanan Publik',soal:'Antrian panjang dan sistem komputer error. Masyarakat mulai gelisah. Anda...',pilihan:{A:'Tutup loket sambil tunggu teknisi',B:'Layani manual sambil komunikasikan situasi, tawarkan solusi alternatif',C:'Suruh antri lebih lama',D:'Pulang karena tidak bisa melayani',E:'Biarkan saja sampai error teratasi otomatis'},kunci:'B',bobot:3,pembahasan:'Pelayanan publik dalam kendala teknis: Lanjutkan pelayanan manual, komunikasi transparan, dan tawarkan solusi alternatif.',tips:'Kendala Teknis ≠ Tutup Pelayanan'},
+  {id:42,subtes:'TKP',kategori:'Integritas',soal:'Menemukan uang cukup besar tertinggal di ruang rapat. Anda...',pilihan:{A:'Ambil karena tidak ada yang tahu',B:'Simpan sambil tunggu ada yang cari',C:'Laporkan ke atasan, dokumentasikan, dan serahkan melalui mekanisme resmi',D:'Bagikan ke rekan yang lebih butuh',E:'Suruh orang lain kembalikan agar tidak dicurigai'},kunci:'C',bobot:3,pembahasan:'Integritas: Temuan barang milik orang lain harus dilaporkan dan diserahkan melalui prosedur resmi.',tips:'Integritas = Jujur dalam hal kecil juga'},
+  {id:43,subtes:'TKP',kategori:'Profesionalisme',soal:'Tidak setuju kebijakan baru atasan karena kurang efektif. Anda...',pilihan:{A:'Tolak melaksanakan terang-terangan',B:'Langsung lapor ke inspektorat',C:'Laksanakan sambil sampaikan masukan profesional melalui jalur yang tepat',D:'Beritahu semua rekan kritikan Anda',E:'Menunggu kebijakan dihapus sendiri'},kunci:'C',bobot:3,pembahasan:'Profesionalisme: Laksanakan kebijakan atasan, namun sampaikan masukan perbaikan melalui saluran formal yang tepat.',tips:'Profesional = Patuh tetapi transparan tentang kekhawatiran'},
+  {id:44,subtes:'TKP',kategori:'Sosial Budaya',soal:'Anggota tim terkucilkan karena perbedaan latar belakang. Anda...',pilihan:{A:'Biarkan dinamika sosial mengatur sendiri',B:'Aktif ajak bergabung dalam kegiatan, dorong inklusi dalam tim',C:'Hanya berteman dengan yang sesuku',D:'Tanya ke yang terkucilkan alasan mereka berbeda',E:'Lapor ke atasan untuk pindahkan orang itu'},kunci:'B',bobot:3,pembahasan:'Sosial budaya: Ciptakan iklim inklusi dengan mengajak semua anggota tim aktif berpartisipasi.',tips:'Inklusi = Aksi positif mengajak semua, bukan pasif'},
+  {id:45,subtes:'TKP',kategori:'Manajemen Diri',soal:'Konflik pribadi dengan rekan satu tim mempengaruhi suasana kerja. Anda...',pilihan:{A:'Hindari rekan tersebut sepenuhnya',B:'Minta pindah tim',C:'Pisahkan urusan pribadi dari profesional, selesaikan konflikkomunikasi privat jika diperlukan',D:'Lapor ke atasan semua detail konflik pribadi',E:'Biarkan semua orang tahu tentang konflik'},kunci:'C',bobot:3,pembahasan:'Manajemen diri & profesionalisme: Pisahkan masalah pribadi dari kerja, coba selesaikan komunikasi pribadi yang sehat.',tips:'Profesi ≠ Pribadi, tapi keduanya perlu dikelola dewasa'},
+];
+
+let currentSoal = 0;
+let jawaban = {};
+let ragu = new Set();
+let timeLeft = 2700; // 45 menit untuk 50 soal
+let timerInterval;
+let selectedOption = null;
+
+function startExam() {
+  showScreen('exam');
+  renderSoal();
+  renderGrid();
+  startTimer();
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+}
+
+function renderSoal() {
+  const soal = bankSoal[currentSoal];
+  document.getElementById('soalNum').textContent = `Soal ${currentSoal + 1} dari ${bankSoal.length}`;
+  document.getElementById('subtesBadge').textContent = soal.subtes;
+  document.getElementById('subtesBadge').style.background = soal.subtes === 'TWK' ? '#eff6ff' : soal.subtes === 'TIU' ? '#f0fdf4' : '#f5f3ff';
+  document.getElementById('subtesBadge').style.color = soal.subtes === 'TWK' ? '#2563eb' : soal.subtes === 'TIU' ? '#16a34a' : '#7c3aed';
+  document.getElementById('progressText').textContent = `${soal.subtes}`;
+  document.getElementById('soalKategori').textContent = soal.kategori;
+  document.getElementById('soalText').textContent = soal.soal;
+  
+  const pilihanList = document.getElementById('pilihanList');
+  pilihanList.innerHTML = '';
+  Object.keys(soal.pilihan).forEach(key => {
+    const div = document.createElement('div');
+    div.className = 'pilihan';
+    if (jawaban[currentSoal] === key) div.classList.add('selected');
+    if (ragu.has(currentSoal)) div.classList.add('ragu');
+    div.innerHTML = `<div class="pilihan-label">${key}</div><div class="pilihan-text">${soal.pilihan[key]}</div>`;
+    div.onclick = () => selectPilihan(key);
+    pilihanList.appendChild(div);
+  });
+
+  document.getElementById('btnNext').textContent = currentSoal === bankSoal.length - 1 ? 'Selesai ✓' : 'Selanjutnya →';
+}
+
+function selectPilihan(key) {
+  jawaban[currentSoal] = key;
+  ragu.delete(currentSoal);
+  renderSoal();
+  renderGrid();
+}
+
+function toggleRagu() {
+  if (ragu.has(currentSoal)) ragu.delete(currentSoal);
+  else ragu.add(currentSoal);
+  renderSoal();
+  renderGrid();
+}
+
+function nextOrFinish() {
+  if (currentSoal === bankSoal.length - 1) finishConfirm();
+  else { currentSoal++; renderSoal(); renderGrid(); }
+}
+
+function prevSoal() {
+  if (currentSoal > 0) { currentSoal--; renderSoal(); renderGrid(); }
+}
+
+function renderGrid() {
+  const grid = document.getElementById('soalGrid');
+  grid.innerHTML = '';
+  bankSoal.forEach((s, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'soal-dot';
+    if (i === currentSoal) dot.classList.add('current');
+    if (jawaban[i]) dot.classList.add('answered');
+    if (ragu.has(i)) dot.classList.add('ragu');
+    dot.textContent = i + 1;
+    dot.onclick = () => { currentSoal = i; renderSoal(); renderGrid(); };
+    grid.appendChild(dot);
+  });
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerInterval); finishConfirm(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  document.getElementById('timerDisplay').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+  const timerBox = document.getElementById('timerBox');
+  if (timeLeft <= 300) timerBox.className = 'timer-box red';
+  else if (timeLeft <= 600) timerBox.className = 'timer-box warning';
+  else timerBox.className = 'timer-box ok';
+}
+
+function finishConfirm() {
+  clearInterval(timerInterval);
+  calculateResult();
+}
+
+function calculateResult() {
+  const scores = { TWK: 0, TIU: 0, TKP: 0 };
+  const totals = { TWK: 0, TIU: 0, TKP: 0 };
+  
+  bankSoal.forEach((soal, i) => {
+    const subtes = soal.subtes;
+    totals[subtes]++;
+    if (jawaban[i] === soal.kunci) scores[subtes] += soal.bobot || 5;
+  });
+
+  const totalScore = scores.TWK + scores.TIU + scores.TKP;
+  const maxScore = 15 * 5 + 15 * 5 + 15 * 3; // Estimasi bobot
+  
+  document.getElementById('resultSub').textContent = `Selesai! Total Waktu: ${Math.floor((2700 - timeLeft) / 60)} menit`;
+  
+  let scoreRowHTML = '';
+  ['TWK', 'TIU', 'TKP'].forEach(s => {
+    const pct = totals[s] > 0 ? Math.round((scores[s] / (totals[s] * 5)) * 100) : 0;
+    scoreRowHTML += `<div class="score-card" style="background:${s==='TWK'?'#eff6ff':s==='TIU'?'#f0fdf4':'#f5f3ff'}">
+      <div class="score-val" style="color:${s==='TWK'?'#2563eb':s==='TIU'?'#16a34a':'#7c3aed'}">${pct}%</div>
+      <div class="score-label">${s}</div>
+    </div>`;
+  });
+  document.getElementById('scoreRow').innerHTML = scoreRowHTML;
+  
+  showScreen('result');
+}
+
+function showPembahasan() {
+  document.getElementById('pembahasanWrap').style.display = 'block';
+  let pbHTML = '';
+  bankSoal.forEach((soal, i) => {
+    const isCorrect = jawaban[i] === soal.kunci;
+    pbHTML += `<div class="pb-item ${isCorrect ? 'pb-correct' : 'pb-wrong'}">
+      <div class="pb-num">Soal ${i + 1} - ${soal.subtes} (${soal.kategori})</div>
+      <div class="pb-soal"><strong>${soal.soal}</strong></div>
+      <div class="pb-kunci">Jawaban Anda: <span>${jawaban[i] || '-'}</span> | Kunci: <span>${soal.kunci}</span></div>
+      <div class="pb-tips">💡 ${soal.pembahasan} <br><strong>Tips:</strong> ${soal.tips}</div>
+    </div>`;
+  });
+  document.getElementById('pembahasanList').innerHTML = pbHTML;
+}
+
+function goHome() {
+  currentSoal = 0;
+  jawaban = {};
+  ragu = new Set();
+  timeLeft = 2700;
+  showScreen('home');
+}
+</script>
+</body>
+</html>
