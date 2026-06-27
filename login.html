@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login / Daftar — BelajarSKD Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#1B6B3A;--green-light:#f0fdf4;--green-mid:#bbf7d0;
+  --blue:#2563eb;--blue-light:#eff6ff;
+  --amber:#d97706;--amber-light:#fffbeb;--amber-mid:#fde68a;
+  --red:#dc2626;--red-light:#fef2f2;--red-mid:#fecaca;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --border:#e2e8f0;--surface:#fff;--bg:#f0f4f8;
+  --radius:12px;--radius-sm:8px;
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(135deg,#1B6B3A 0%,#2E8B57 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-md);width:100%;max-width:440px;padding:2.5rem 2rem;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.logo{width:80px;height:80px;margin:0 auto 1rem;filter:drop-shadow(0 3px 8px rgba(0,0,0,.15));display:block;}
+.card-title{font-size:1.5rem;font-weight:700;color:var(--text);text-align:center;margin-bottom:.3rem;}
+.card-sub{color:var(--text2);font-size:.88rem;text-align:center;margin-bottom:2rem;line-height:1.5;}
+.tabs{display:flex;background:#f1f5f9;border-radius:var(--radius-sm);padding:4px;margin-bottom:1.5rem;gap:4px;}
+.tab{flex:1;text-align:center;padding:9px;border-radius:6px;font-size:.88rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .2s;}
+.tab.active{background:var(--surface);color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.form-section{display:none;}
+.form-section.active{display:block;}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-size:.8rem;font-weight:600;color:var(--text2);margin-bottom:5px;}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.92rem;font-family:inherit;color:var(--text);background:#f8fafc;outline:none;transition:border-color .15s;}
+.field input:focus{border-color:var(--green);background:#fff;}
+.field input.error{border-color:var(--red);background:var(--red-light);}
+.err-msg{font-size:.75rem;color:var(--red);margin-top:4px;display:none;}
+.btn-main{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px;font-size:.95rem;font-weight:700;cursor:pointer;transition:opacity .15s;font-family:inherit;margin-top:.5rem;}
+.btn-main:hover{opacity:.88;}
+.btn-main:disabled{opacity:.5;cursor:not-allowed;}
+.divider{display:flex;align-items:center;gap:10px;margin:1.2rem 0;color:var(--text3);font-size:.8rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:.83rem;font-weight:500;margin-bottom:1rem;display:none;line-height:1.5;}
+.alert.success{background:var(--green-light);border:1px solid var(--green-mid);color:#166534;}
+.alert.error{background:var(--red-light);border:1px solid var(--red-mid);color:#991b1b;}
+.alert.show{display:block;}
+.premium-badge{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:.5rem;}
+.back-link{display:block;text-align:center;margin-top:1.2rem;font-size:.83rem;color:var(--text2);}
+.back-link a{color:var(--green);font-weight:600;text-decoration:none;}
+.back-link a:hover{text-decoration:underline;}
+.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pass-wrap{position:relative;}
+.pass-wrap input{padding-right:44px;}
+.pass-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:1rem;padding:4px;}
+.benefit-list{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:.9rem 1rem;margin-bottom:1.2rem;font-size:.82rem;color:var(--text2);line-height:1.9;}
+.benefit-list li{list-style:none;padding-left:4px;}
+.benefit-list li::before{content:'✓ ';color:var(--green);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="card">
+  <!-- Logo -->
+  <svg class="logo" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="55" cy="55" r="53" fill="#F5C518" stroke="#E0A800" stroke-width="1.5"/>
+    <circle cx="55" cy="55" r="40" fill="#C8E6A0"/>
+    <path d="M20 36 Q30 10 55 8 Q42 14 30 30 Z" fill="#CC0000" opacity="0.85"/>
+    <path d="M90 74 Q80 100 55 102 Q68 96 80 80 Z" fill="#CC0000" opacity="0.85"/>
+    <path d="M55 18 C55 18 38 26 38 42 L38 56 C38 66 46 73 55 77 C64 73 72 66 72 56 L72 42 C72 26 55 18 55 18Z" fill="#2E7D32"/>
+    <path d="M55 22 C55 22 42 29 42 43 L42 56 C42 64 49 70 55 74 C61 70 68 64 68 56 L68 43 C68 29 55 22 55 22Z" fill="#43A047"/>
+    <text x="55" y="53" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="15" font-weight="900" fill="#F5C518" letter-spacing="1">CAT</text>
+    <text x="55" y="67" text-anchor="middle" font-family="Arial,sans-serif" font-size="6.5" font-weight="800" fill="#F5C518" letter-spacing="1.5">SIMULASI</text>
+    <text x="55" y="13" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" font-weight="800" fill="#1a1a1a" letter-spacing="2">SKD</text>
+    <defs><path id="bA" d="M 10.5 68 A 46 46 0 0 0 99.5 68"/></defs>
+    <text font-family="Arial,sans-serif" font-size="5.8" font-weight="800" fill="#1a1a1a">
+      <textPath href="#bA" startOffset="50%" text-anchor="middle" letter-spacing="0.6">Latihan Computer Assisted Test CPNS</textPath>
+    </text>
+    <polygon points="55,22 56.5,26.5 61,26.5 57.5,29 59,33.5 55,31 51,33.5 52.5,29 49,26.5 53.5,26.5" fill="#F5C518"/>
+    <circle cx="55" cy="55" r="40" fill="none" stroke="#E0A800" stroke-width="1.5"/>
+    <circle cx="55" cy="55" r="53" fill="none" stroke="#B8860B" stroke-width="1"/>
+  </svg>
+
+  <div class="card-title">BelajarSKD</div>
+  <div class="card-sub">Akses 650 soal CAT CPNS lengkap dengan<br>soal figural, timer, dan pembahasan mendalam</div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login')">Masuk</div>
+    <div class="tab" onclick="switchTab('daftar')">Daftar Akun</div>
+  </div>
+
+  <!-- ALERT -->
+  <div class="alert" id="alertBox"></div>
+
+  <!-- ── FORM LOGIN ── -->
+  <div class="form-section active" id="sectionLogin">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="email@kamu.com" autocomplete="email">
+      <div class="err-msg" id="errLoginEmail">Email tidak valid</div>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="loginPassword" placeholder="Masukkan password" autocomplete="current-password">
+        <button class="pass-toggle" onclick="togglePass('loginPassword')">👁</button>
+      </div>
+      <div class="err-msg" id="errLoginPass">Password tidak boleh kosong</div>
+    </div>
+    <div style="text-align:right;margin-bottom:1rem;">
+      <a href="#" onclick="switchTab('lupa')" style="font-size:.8rem;color:var(--green);font-weight:600;text-decoration:none;">Lupa password?</a>
+    </div>
+    <button class="btn-main" id="btnLogin" onclick="doLogin()">Masuk</button>
+  </div>
+
+  <!-- ── FORM DAFTAR ── -->
+  <div class="form-section" id="sectionDaftar">
+    <div style="text-align:center;margin-bottom:1rem;">
+      <span class="premium-badge">🏆 Akses Selamanya — Rp25.000</span>
+    </div>
+    <ul class="benefit-list">
+      <li>650 soal TWK, TIU, TKP lengkap</li>
+      <li>Soal figural SVG interaktif</li>
+      <li>Pembahasan mendalam setiap soal</li>
+      <li>Soal diacak otomatis — selalu berbeda</li>
+      <li>Riwayat nilai dan grafik perkembangan</li>
+      <li>Akses selamanya dari perangkat manapun</li>
+    </ul>
+    <div class="field">
+      <label>Nama Lengkap</label>
+      <input type="text" id="daftarNama" placeholder="Nama lengkap kamu" maxlength="60">
+      <div class="err-msg" id="errDaftarNama">Nama wajib diisi</div>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="daftarEmail" placeholder="email@kamu.com" autocomplete="email">
+      <div class="err-msg" id="errDaftarEmail">Email tidak valid</div>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="daftarPassword" placeholder="Minimal 8 karakter" autocomplete="new-password">
+        <button class="pass-toggle" onclick="togglePass('daftarPassword')">👁</button>
+      </div>
+      <div class="err-msg" id="errDaftarPass">Password minimal 8 karakter</div>
+    </div>
+    <div class="field">
+      <label>Konfirmasi Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="daftarPasswordConfirm" placeholder="Ulangi password" autocomplete="new-password">
+        <button class="pass-toggle" onclick="togglePass('daftarPasswordConfirm')">👁</button>
+      </div>
+      <div class="err-msg" id="errDaftarPassConfirm">Password tidak cocok</div>
+    </div>
+    <button class="btn-main" id="btnDaftar" onclick="doDaftar()">Daftar &amp; Lanjut Pembayaran →</button>
+    <div style="text-align:center;margin-top:1rem;font-size:.78rem;color:var(--text3);">
+      Dengan mendaftar, kamu setuju dengan<br>Syarat &amp; Ketentuan BelajarSKD
+    </div>
+  </div>
+
+  <!-- ── FORM LUPA PASSWORD ── -->
+  <div class="form-section" id="sectionLupa">
+    <p style="font-size:.88rem;color:var(--text2);margin-bottom:1.2rem;line-height:1.6;">
+      Masukkan email yang kamu gunakan saat daftar. Kami akan kirim link reset password.
+    </p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="lupaEmail" placeholder="email@kamu.com">
+      <div class="err-msg" id="errLupaEmail">Email tidak valid</div>
+    </div>
+    <button class="btn-main" id="btnLupa" onclick="doResetPassword()">Kirim Link Reset Password</button>
+    <div style="text-align:center;margin-top:1rem;">
+      <a href="#" onclick="switchTab('login')" style="font-size:.83rem;color:var(--green);font-weight:600;text-decoration:none;">← Kembali ke Login</a>
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="index.html">← Kembali ke Beranda BelajarSKD</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── Supabase Init ──
+const SUPABASE_URL = 'https://ivjdkylkvgutxyhuvxmj.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_VZ8NChOK61VKpNN3HcPPfA_OgkFdflC';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── Cek jika sudah login → langsung ke app ──
+(async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    window.location.href = 'app.html';
+  }
+})();
+
+// ── Tab Switching ──
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  hideAlert();
+
+  if (tab === 'login') {
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('sectionLogin').classList.add('active');
+  } else if (tab === 'daftar') {
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('sectionDaftar').classList.add('active');
+  } else if (tab === 'lupa') {
+    document.getElementById('sectionLupa').classList.add('active');
+  }
+}
+
+// ── Alert ──
+function showAlert(msg, type) {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg;
+  el.className = 'alert show ' + type;
+}
+function hideAlert() {
+  document.getElementById('alertBox').className = 'alert';
+}
+
+// ── Toggle Password Visibility ──
+function togglePass(id) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── Set Button Loading State ──
+function setLoading(btnId, loading, text) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="spinner"></span>Memproses...' : text;
+}
+
+// ── Validasi Email ──
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ── FORM: LOGIN ──
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  let valid = true;
+
+  if (!isValidEmail(email)) {
+    document.getElementById('loginEmail').classList.add('error');
+    document.getElementById('errLoginEmail').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('loginEmail').classList.remove('error');
+    document.getElementById('errLoginEmail').style.display = 'none';
+  }
+  if (!pass) {
+    document.getElementById('loginPassword').classList.add('error');
+    document.getElementById('errLoginPass').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('loginPassword').classList.remove('error');
+    document.getElementById('errLoginPass').style.display = 'none';
+  }
+  if (!valid) return;
+
+  setLoading('btnLogin', true, 'Masuk');
+  hideAlert();
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    setLoading('btnLogin', false, 'Masuk');
+    let msg = 'Login gagal. Periksa email dan password kamu.';
+    if (error.message.includes('Invalid login')) msg = 'Email atau password salah.';
+    if (error.message.includes('Email not confirmed')) msg = 'Email belum dikonfirmasi. Cek inbox kamu.';
+    showAlert('❌ ' + msg, 'error');
+    return;
+  }
+
+  // Cek status premium
+  const { data: profile } = await sb.from('profiles').select('status_premium, nama').eq('id', data.user.id).single();
+
+  if (profile && profile.status_premium) {
+    showAlert('✅ Selamat datang, ' + profile.nama + '! Mengalihkan ke aplikasi...', 'success');
+    setTimeout(() => { window.location.href = 'app.html'; }, 1200);
+  } else {
+    showAlert('✅ Login berhasil! Melanjutkan ke halaman pembayaran...', 'success');
+    setTimeout(() => { window.location.href = 'bayar.html'; }, 1200);
+  }
+}
+
+// ── FORM: DAFTAR ──
+async function doDaftar() {
+  const nama = document.getElementById('daftarNama').value.trim();
+  const email = document.getElementById('daftarEmail').value.trim();
+  const pass = document.getElementById('daftarPassword').value;
+  const passConfirm = document.getElementById('daftarPasswordConfirm').value;
+  let valid = true;
+
+  // Validasi nama
+  if (!nama) {
+    document.getElementById('daftarNama').classList.add('error');
+    document.getElementById('errDaftarNama').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('daftarNama').classList.remove('error');
+    document.getElementById('errDaftarNama').style.display = 'none';
+  }
+
+  // Validasi email
+  if (!isValidEmail(email)) {
+    document.getElementById('daftarEmail').classList.add('error');
+    document.getElementById('errDaftarEmail').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('daftarEmail').classList.remove('error');
+    document.getElementById('errDaftarEmail').style.display = 'none';
+  }
+
+  // Validasi password
+  if (pass.length < 8) {
+    document.getElementById('daftarPassword').classList.add('error');
+    document.getElementById('errDaftarPass').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('daftarPassword').classList.remove('error');
+    document.getElementById('errDaftarPass').style.display = 'none';
+  }
+
+  // Validasi konfirmasi password
+  if (pass !== passConfirm) {
+    document.getElementById('daftarPasswordConfirm').classList.add('error');
+    document.getElementById('errDaftarPassConfirm').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('daftarPasswordConfirm').classList.remove('error');
+    document.getElementById('errDaftarPassConfirm').style.display = 'none';
+  }
+
+  if (!valid) return;
+
+  setLoading('btnDaftar', true, 'Daftar & Lanjut Pembayaran →');
+  hideAlert();
+
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password: pass,
+    options: {
+      data: { nama }
+    }
+  });
+
+  if (error) {
+    setLoading('btnDaftar', false, 'Daftar & Lanjut Pembayaran →');
+    let msg = 'Pendaftaran gagal.';
+    if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+      msg = 'Email ini sudah terdaftar. Silakan login.';
+    }
+    showAlert('❌ ' + msg, 'error');
+    return;
+  }
+
+  showAlert('✅ Akun berhasil dibuat! Melanjutkan ke pembayaran...', 'success');
+  // Simpan nama ke localStorage untuk ditampilkan di halaman bayar
+  localStorage.setItem('bskd_nama', nama);
+  localStorage.setItem('bskd_email', email);
+  setTimeout(() => { window.location.href = 'bayar.html'; }, 1500);
+}
+
+// ── FORM: RESET PASSWORD ──
+async function doResetPassword() {
+  const email = document.getElementById('lupaEmail').value.trim();
+
+  if (!isValidEmail(email)) {
+    document.getElementById('lupaEmail').classList.add('error');
+    document.getElementById('errLupaEmail').style.display = 'block';
+    return;
+  }
+  document.getElementById('lupaEmail').classList.remove('error');
+  document.getElementById('errLupaEmail').style.display = 'none';
+
+  setLoading('btnLupa', true, 'Kirim Link Reset Password');
+  hideAlert();
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://belajarskd.vercel.app/reset-password.html'
+  });
+
+  setLoading('btnLupa', false, 'Kirim Link Reset Password');
+
+  if (error) {
+    showAlert('❌ Gagal kirim email. Pastikan email sudah terdaftar.', 'error');
+    return;
+  }
+
+  showAlert('✅ Link reset password sudah dikirim ke ' + email + '. Cek inbox (dan folder spam) kamu!', 'success');
+}
+
+// Enter key support
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const activeSection = document.querySelector('.form-section.active');
+  if (!activeSection) return;
+  if (activeSection.id === 'sectionLogin') doLogin();
+  else if (activeSection.id === 'sectionDaftar') doDaftar();
+  else if (activeSection.id === 'sectionLupa') doResetPassword();
+});
+</script>
+</body>
+</html>
