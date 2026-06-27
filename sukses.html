@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pembayaran Berhasil — BelajarSKD</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(135deg,#1B6B3A,#2E8B57);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.card{background:#fff;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,.15);padding:2.5rem 2rem;max-width:420px;width:100%;text-align:center;}
+.icon{font-size:4rem;margin-bottom:1rem;animation:pop .5s ease;}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+h1{font-size:1.4rem;font-weight:700;color:#0f172a;margin-bottom:.5rem;}
+p{color:#475569;font-size:.9rem;line-height:1.6;margin-bottom:1.5rem;}
+.order-info{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:.83rem;color:#166534;margin-bottom:1.5rem;}
+.btn{display:block;width:100%;background:#1B6B3A;color:#fff;border:none;border-radius:8px;padding:14px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit;margin-bottom:8px;}
+.btn:hover{opacity:.88;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">🎉</div>
+  <h1>Pembayaran Berhasil!</h1>
+  <p>Selamat! Akses Premium BelajarSKD kamu sudah aktif selamanya. Mulai latihan soal CAT CPNS sekarang!</p>
+  <div class="order-info" id="orderInfo">Memuat detail transaksi...</div>
+  <a href="app.html" class="btn">🚀 Mulai Simulasi CAT Sekarang</a>
+  <a href="index.html" class="btn" style="background:#f1f5f9;color:#475569;">← Kembali ke Beranda</a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = supabase.createClient('https://ivjdkylkvgutxyhuvxmj.supabase.co', 'sb_publishable_VZ8NChOK61VKpNN3HcPPfA_OgkFdflC');
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get('order');
+if (orderId) {
+  document.getElementById('orderInfo').innerHTML = '✅ Order ID: <strong>' + orderId + '</strong><br>Akses: <strong>Selamanya (Lifetime)</strong>';
+}
+// Konfirmasi session masih aktif
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (!session) window.location.href = 'login.html';
+});
+</script>
+</body>
+</html>
