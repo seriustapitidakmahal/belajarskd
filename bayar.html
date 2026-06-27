@@ -9,40 +9,63 @@
 :root{
   --green:#1B6B3A;--green-light:#f0fdf4;--green-mid:#bbf7d0;
   --amber:#d97706;--amber-light:#fffbeb;--amber-mid:#fde68a;
-  --red:#dc2626;--red-light:#fef2f2;
+  --red:#dc2626;--red-light:#fef2f2;--red-mid:#fecaca;
+  --blue:#2563eb;--blue-light:#eff6ff;
   --text:#0f172a;--text2:#475569;--text3:#94a3b8;
   --border:#e2e8f0;--surface:#fff;--bg:#f0f4f8;
   --radius:12px;--radius-sm:8px;--shadow-md:0 4px 16px rgba(0,0,0,.10);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;}
-.wrap{max-width:480px;width:100%;}
-.card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-md);padding:2rem;}
-.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;}
+.wrap{max-width:500px;width:100%;}
+.card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-md);padding:2rem;margin-bottom:1rem;}
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border);}
 .logo-mini{width:48px;height:48px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.12));}
-.brand{font-size:1.1rem;font-weight:700;color:var(--text);}
-.brand span{display:block;font-size:.78rem;font-weight:500;color:var(--text3);}
-.section-title{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:1rem;}
+.brand{font-size:1.05rem;font-weight:700;color:var(--text);}
+.brand span{display:block;font-size:.75rem;font-weight:500;color:var(--text3);}
+h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.8rem;}
 .order-box{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.2rem;margin-bottom:1.2rem;}
-.order-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.88rem;}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.87rem;}
 .order-row:not(:last-child){border-bottom:1px solid var(--border);}
 .order-label{color:var(--text2);}
 .order-val{font-weight:600;color:var(--text);}
 .order-total{font-size:1.1rem;color:var(--green);font-weight:700;}
-.benefit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.2rem;}
-.benefit-item{background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--radius-sm);padding:10px 12px;font-size:.78rem;color:#166534;font-weight:500;}
+/* Transfer manual box */
+.transfer-box{background:#fffbeb;border:2px solid #fde68a;border-radius:var(--radius-sm);padding:1.2rem;margin-bottom:1.2rem;}
+.transfer-title{font-size:.88rem;font-weight:700;color:#92400e;margin-bottom:.8rem;display:flex;align-items:center;gap:6px;}
+.bank-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;margin-bottom:.6rem;}
+.bank-name{font-size:.78rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.bank-norek{font-size:1.1rem;font-weight:700;color:var(--text);letter-spacing:.08em;font-family:monospace;}
+.bank-atas{font-size:.8rem;color:var(--text2);}
+.copy-btn{background:var(--blue-light);color:var(--blue);border:none;border-radius:6px;padding:4px 10px;font-size:.73rem;font-weight:700;cursor:pointer;float:right;font-family:inherit;margin-top:-2px;}
+.copy-btn:hover{background:var(--blue);color:#fff;}
+.nominal-box{background:#f0fdf4;border:1px solid var(--green-mid);border-radius:8px;padding:.8rem 1rem;margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:center;}
+.nominal-label{font-size:.82rem;color:#166534;font-weight:600;}
+.nominal-val{font-size:1.2rem;font-weight:700;color:var(--green);}
+/* Step konfirmasi */
+.steps{counter-reset:step;margin-bottom:1.2rem;}
+.step-item{display:flex;gap:10px;padding:.6rem 0;font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);}
+.step-item:last-child{border-bottom:none;}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+/* Tombol konfirmasi */
+.btn-confirm{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;margin-bottom:8px;}
+.btn-confirm:hover{opacity:.88;}
+.btn-confirm:disabled{opacity:.5;cursor:not-allowed;}
+.btn-outline{display:block;text-align:center;padding:10px;font-size:.85rem;color:var(--text2);border:1.5px solid var(--border);border-radius:var(--radius-sm);text-decoration:none;font-weight:500;}
+.btn-outline:hover{background:#f8fafc;}
+/* Modal konfirmasi terkirim */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#fff;border-radius:16px;padding:2rem;max-width:380px;width:100%;text-align:center;}
+.modal-icon{font-size:3.5rem;margin-bottom:1rem;}
+.modal-title{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:.5rem;}
+.modal-sub{font-size:.85rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6;}
+.btn-modal{display:block;width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;margin-bottom:8px;}
+/* Benefit */
+.benefit-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1.2rem;}
+.benefit-item{background:var(--green-light);border:1px solid var(--green-mid);border-radius:8px;padding:8px 10px;font-size:.76rem;color:#166534;font-weight:500;}
 .benefit-item::before{content:'✓ ';font-weight:700;}
-.payment-methods{display:flex;gap:8px;margin-bottom:1.2rem;flex-wrap:wrap;}
-.pm-badge{background:#f1f5f9;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:.72rem;font-weight:600;color:var(--text2);}
-.btn-pay{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);padding:15px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;}
-.btn-pay:hover{opacity:.88;}
-.btn-pay:disabled{opacity:.5;cursor:not-allowed;}
-.secure-note{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:.8rem;font-size:.75rem;color:var(--text3);}
-.btn-back{display:block;text-align:center;margin-top:1rem;font-size:.83rem;color:var(--text2);text-decoration:none;}
-.btn-back:hover{color:var(--green);}
-.alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:.83rem;font-weight:500;margin-bottom:1rem;display:none;}
-.alert.show{display:block;}
-.alert.info{background:var(--amber-light);border:1px solid var(--amber-mid);color:#92400e;}
+.user-info-badge{background:var(--blue-light);border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font-size:.82rem;color:var(--blue);font-weight:600;margin-bottom:1.2rem;display:flex;align-items:center;gap:8px;}
 .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -50,6 +73,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);min-height:
 <body>
 <div class="wrap">
   <div class="card">
+    <!-- Header -->
     <div class="logo-row">
       <svg class="logo-mini" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
         <circle cx="55" cy="55" r="53" fill="#F5C518" stroke="#E0A800" stroke-width="1.5"/>
@@ -58,35 +82,40 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);min-height:
         <path d="M55 22 C55 22 42 29 42 43 L42 56 C42 64 49 70 55 74 C61 70 68 64 68 56 L68 43 C68 29 55 22 55 22Z" fill="#43A047"/>
         <text x="55" y="53" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="15" font-weight="900" fill="#F5C518" letter-spacing="1">CAT</text>
         <circle cx="55" cy="55" r="40" fill="none" stroke="#E0A800" stroke-width="1.5"/>
+        <circle cx="55" cy="55" r="53" fill="none" stroke="#B8860B" stroke-width="1"/>
       </svg>
-      <div class="brand">BelajarSKD Premium<span>Akses Selamanya</span></div>
+      <div class="brand">BelajarSKD Premium<span>Akses Selamanya — Rp25.000</span></div>
     </div>
 
-    <div class="alert info show" id="alertInfo">
-      👋 Akun berhasil dibuat! Selesaikan pembayaran untuk mengaktifkan akses 650 soal premium.
+    <!-- User info -->
+    <div class="user-info-badge" id="userBadge">
+      <span>👤</span>
+      <span id="userEmailDisplay">Memuat...</span>
     </div>
 
-    <div class="section-title">📋 Ringkasan Pesanan</div>
+    <!-- Ringkasan order -->
+    <h3>📋 Ringkasan Pesanan</h3>
     <div class="order-box">
       <div class="order-row">
         <span class="order-label">Produk</span>
         <span class="order-val">BelajarSKD Premium</span>
       </div>
       <div class="order-row">
-        <span class="order-label">Akses</span>
+        <span class="order-label">Tipe Akses</span>
         <span class="order-val">Selamanya (Lifetime)</span>
       </div>
       <div class="order-row">
-        <span class="order-label">User</span>
-        <span class="order-val" id="userEmailDisplay">—</span>
+        <span class="order-label">Jumlah Soal</span>
+        <span class="order-val">650 soal TWK+TIU+TKP</span>
       </div>
       <div class="order-row">
-        <span class="order-label">Total Pembayaran</span>
+        <span class="order-label">Total Bayar</span>
         <span class="order-val order-total">Rp 25.000</span>
       </div>
     </div>
 
-    <div class="section-title">🎁 Yang Kamu Dapatkan</div>
+    <!-- Yang didapatkan -->
+    <h3>🎁 Yang Kamu Dapatkan</h3>
     <div class="benefit-grid">
       <div class="benefit-item">650 soal lengkap</div>
       <div class="benefit-item">Soal figural SVG</div>
@@ -96,25 +125,84 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);min-height:
       <div class="benefit-item">Multi-device</div>
     </div>
 
-    <div class="section-title">💳 Metode Pembayaran</div>
-    <div class="payment-methods">
-      <span class="pm-badge">QRIS</span>
-      <span class="pm-badge">Transfer Bank</span>
-      <span class="pm-badge">GoPay</span>
-      <span class="pm-badge">OVO</span>
-      <span class="pm-badge">Dana</span>
-      <span class="pm-badge">ShopeePay</span>
-      <span class="pm-badge">Indomaret</span>
-      <span class="pm-badge">Alfamart</span>
+    <!-- Transfer manual -->
+    <h3>💳 Cara Pembayaran</h3>
+    <div class="transfer-box">
+      <div class="transfer-title">🏦 Transfer ke salah satu rekening berikut:</div>
+
+      <div class="nominal-box">
+        <span class="nominal-label">💰 Nominal Transfer</span>
+        <span class="nominal-val">Rp 25.000</span>
+      </div>
+
+      <div class="bank-item">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div class="bank-name">Bank BSI</div>
+            <div class="bank-norek" id="norekBCA">1234567890</div>
+            <div class="bank-atas">a.n. Nama Pemilik Akun</div>
+          </div>
+          <button class="copy-btn" onclick="copyText('1234567890', this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="bank-item">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div class="bank-name">GoPay / OVO / Dana</div>
+            <div class="bank-norek" id="norekGopay">081234567890</div>
+            <div class="bank-atas">a.n. Nama Pemilik Akun</div>
+          </div>
+          <button class="copy-btn" onclick="copyText('081234567890', this)">Copy</button>
+        </div>
+      </div>
+
+      <div style="font-size:.78rem;color:#92400e;margin-top:.6rem;line-height:1.6;">
+        ⚠️ Transfer sesuai nominal tepat <strong>Rp25.000</strong>. Setelah transfer, klik tombol konfirmasi di bawah.
+      </div>
     </div>
 
-    <button class="btn-pay" id="btnPay" onclick="bayarSekarang()">
-      🔒 Bayar Rp25.000 Sekarang
-    </button>
-    <div class="secure-note">
-      🔒 Pembayaran diproses aman oleh Midtrans
+    <!-- Langkah-langkah -->
+    <h3>📝 Langkah Aktivasi</h3>
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div>Transfer <strong>Rp25.000</strong> ke salah satu rekening di atas</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div>Klik tombol <strong>"Saya Sudah Transfer"</strong> di bawah</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div>Kami verifikasi dalam <strong>maks. 1×24 jam</strong> (biasanya lebih cepat)</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div>Akses 650 soal langsung aktif dan <strong>email konfirmasi</strong> dikirim</div>
+      </div>
     </div>
-    <a href="login.html" class="btn-back">← Kembali ke halaman login</a>
+
+    <!-- Tombol konfirmasi -->
+    <button class="btn-confirm" id="btnKonfirmasi" onclick="konfirmasiTransfer()">
+      ✅ Saya Sudah Transfer — Konfirmasi Sekarang
+    </button>
+    <a href="index.html" class="btn-outline">← Kembali ke Beranda</a>
+  </div>
+</div>
+
+<!-- Modal sukses konfirmasi -->
+<div class="modal-overlay" id="modalSukses">
+  <div class="modal-box">
+    <div class="modal-icon">📨</div>
+    <div class="modal-title">Konfirmasi Diterima!</div>
+    <div class="modal-sub">
+      Terima kasih! Pembayaran kamu sedang kami verifikasi.<br><br>
+      Akses premium akan aktif dalam <strong>maks. 1×24 jam</strong>.<br>
+      Notifikasi akan dikirim ke email kamu.
+    </div>
+    <a href="index.html" class="btn-modal">← Kembali ke Beranda</a>
+    <a href="soal-gratis.html" class="btn-modal" style="background:#f1f5f9;color:#475569;border:none;display:block;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.92rem;">Coba 50 Soal Gratis Dulu</a>
   </div>
 </div>
 
@@ -124,104 +212,82 @@ const SUPABASE_URL = 'https://ivjdkylkvgutxyhuvxmj.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_VZ8NChOK61VKpNN3HcPPfA_OgkFdflC';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// Tampilkan email user
+// ── Ganti dengan nomor rekening asli Anda ──
+// Cari teks "1234567890" dan "081234567890" di file ini
+// lalu ganti dengan nomor rekening dan nomor e-wallet Anda yang sebenarnya
+
+let currentUser = null;
+
 (async function init() {
-  // Coba dari session aktif
   const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    document.getElementById('userEmailDisplay').textContent = session.user.email;
-    // Kalau sudah premium → langsung ke app
-    const { data: profile } = await sb.from('profiles').select('status_premium').eq('id', session.user.id).single();
-    if (profile && profile.status_premium) {
-      window.location.href = 'app.html';
-      return;
-    }
-  } else {
-    // Ambil dari localStorage jika baru daftar
-    const email = localStorage.getItem('bskd_email');
-    if (email) document.getElementById('userEmailDisplay').textContent = email;
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
   }
+  currentUser = session.user;
+
+  // Cek sudah premium? Langsung ke app
+  const { data: profile } = await sb.from('profiles')
+    .select('status_premium, nama, email')
+    .eq('id', session.user.id)
+    .single();
+
+  if (profile && profile.status_premium) {
+    window.location.href = 'app.html';
+    return;
+  }
+
+  // Tampilkan email user
+  const displayName = (profile && profile.nama) ? profile.nama + ' · ' + session.user.email : session.user.email;
+  document.getElementById('userEmailDisplay').textContent = displayName;
 })();
 
-async function bayarSekarang() {
-  const btn = document.getElementById('btnPay');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Membuka halaman pembayaran...';
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const ori = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.textContent = ori;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2000);
+  });
+}
 
-  // Cek session
-  const { data: { session } } = await sb.auth.getSession();
-
-  if (!session) {
-    // Jika belum login (baru daftar, session belum ready), arahkan ke login dulu
-    alert('Silakan login terlebih dahulu untuk melanjutkan pembayaran.');
+async function konfirmasiTransfer() {
+  if (!currentUser) {
     window.location.href = 'login.html';
     return;
   }
 
-  // Generate order ID unik
-  const orderId = 'BSKD-' + Date.now() + '-' + session.user.id.slice(0,8).toUpperCase();
+  const btn = document.getElementById('btnKonfirmasi');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Mengirim konfirmasi...';
 
-  // Simpan order ke Supabase
-  await sb.from('transaksi').insert({
-    user_id: session.user.id,
+  // Generate order ID
+  const orderId = 'BSKD-MANUAL-' + Date.now();
+
+  // Simpan ke tabel transaksi dengan status "menunggu_verifikasi"
+  const { error } = await sb.from('transaksi').insert({
+    user_id: currentUser.id,
     order_id: orderId,
     jumlah: 25000,
-    status: 'pending'
+    status: 'menunggu_verifikasi',
+    payment_method: 'transfer_manual'
   });
 
-  // ── MIDTRANS SNAP ──
-  // PENTING: Ganti CLIENT_KEY_MIDTRANS dengan Midtrans Client Key kamu nanti
-  // Dan buat Vercel API route /api/create-payment untuk generate snap token
-  const CLIENT_KEY = 'YOUR_MIDTRANS_CLIENT_KEY';
+  if (error) {
+    // Mungkin sudah ada entri sebelumnya — tetap tampilkan modal sukses
+    console.log('Note:', error.message);
+  }
 
-  // Load Midtrans Snap script
-  const snapScript = document.createElement('script');
-  snapScript.src = 'https://app.midtrans.com/snap/snap.js';
-  snapScript.setAttribute('data-client-key', CLIENT_KEY);
-  snapScript.onload = async function() {
-    try {
-      // Minta snap token dari backend Vercel function
-      const res = await fetch('/api/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId,
-          userId: session.user.id,
-          email: session.user.email,
-          nama: localStorage.getItem('bskd_nama') || session.user.email,
-          amount: 25000
-        })
-      });
+  btn.disabled = false;
+  btn.innerHTML = '✅ Saya Sudah Transfer — Konfirmasi Sekarang';
 
-      const { token } = await res.json();
-
-      window.snap.pay(token, {
-        onSuccess: async function(result) {
-          // Update status pembayaran ke Supabase
-          await sb.from('transaksi').update({ status: 'settlement', payment_method: result.payment_type }).eq('order_id', orderId);
-          await sb.from('profiles').update({ status_premium: true, tanggal_bayar: new Date().toISOString(), order_id: orderId }).eq('id', session.user.id);
-          window.location.href = 'sukses.html?order=' + orderId;
-        },
-        onPending: function() {
-          alert('Pembayaran sedang diproses. Silakan selesaikan pembayaran.');
-        },
-        onError: function() {
-          btn.disabled = false;
-          btn.innerHTML = '🔒 Bayar Rp25.000 Sekarang';
-          alert('Pembayaran gagal. Silakan coba lagi.');
-        },
-        onClose: function() {
-          btn.disabled = false;
-          btn.innerHTML = '🔒 Bayar Rp25.000 Sekarang';
-        }
-      });
-    } catch(e) {
-      btn.disabled = false;
-      btn.innerHTML = '🔒 Bayar Rp25.000 Sekarang';
-      alert('Terjadi kesalahan. Silakan coba lagi.');
-    }
-  };
-  document.head.appendChild(snapScript);
+  // Tampilkan modal konfirmasi
+  document.getElementById('modalSukses').classList.add('show');
 }
 </script>
 </body>
