@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — BelajarSKD</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#1B6B3A;--green-light:#f0fdf4;--green-mid:#bbf7d0;
+  --blue:#2563eb;--blue-light:#eff6ff;
+  --amber:#d97706;--amber-light:#fffbeb;--amber-mid:#fde68a;
+  --red:#dc2626;--red-light:#fef2f2;--red-mid:#fecaca;
+  --purple:#7c3aed;--purple-light:#f5f3ff;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --border:#e2e8f0;--surface:#fff;--bg:#f0f4f8;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* LOGIN GATE */
+#loginGate{display:flex;position:fixed;inset:0;background:linear-gradient(135deg,#1B6B3A,#2E8B57);z-index:999;align-items:center;justify-content:center;padding:1rem;}
+#loginGate.hide{display:none;}
+.login-box{background:#fff;border-radius:20px;padding:2.5rem 2rem;max-width:380px;width:100%;text-align:center;box-shadow:var(--shadow-md);}
+.login-box svg{width:64px;height:64px;margin:0 auto 1rem;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.15));}
+.login-box h2{font-size:1.2rem;font-weight:700;margin-bottom:.3rem;color:var(--text);}
+.login-box p{color:var(--text2);font-size:.83rem;margin-bottom:1.5rem;}
+.login-field{margin-bottom:1rem;text-align:left;}
+.login-field label{display:block;font-size:.78rem;font-weight:600;color:var(--text2);margin-bottom:5px;}
+.pass-wrap{position:relative;}
+.pass-wrap input{width:100%;padding:10px 40px 10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:inherit;outline:none;transition:border-color .15s;}
+.pass-wrap input:focus{border-color:var(--green);}
+.pass-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:.95rem;padding:4px;}
+.btn-login{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.btn-login:hover{opacity:.88;}
+.login-err{color:var(--red);font-size:.8rem;margin-top:.8rem;display:none;background:var(--red-light);padding:8px 12px;border-radius:6px;}
+
+/* TOPBAR */
+.topbar{background:var(--green);color:#fff;padding:0 1.5rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.95rem;}
+.topbar-brand svg{width:30px;height:30px;}
+.topbar-right{display:flex;align-items:center;gap:12px;font-size:.8rem;opacity:.9;}
+.btn-logout{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-logout:hover{background:rgba(255,255,255,.28);}
+
+/* MAIN */
+.main{padding:1.5rem;max-width:1100px;margin:0 auto;}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem;}
+.stat-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:1.2rem 1.4rem;box-shadow:var(--shadow);}
+.stat-label{font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;}
+.stat-val{font-size:1.9rem;font-weight:700;line-height:1;}
+.stat-sub{font-size:.75rem;color:var(--text3);margin-top:5px;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:#f1f5f9;border-radius:var(--radius-sm);padding:4px;margin-bottom:1.2rem;width:fit-content;}
+.tab{padding:7px 18px;border-radius:6px;font-size:.84rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s;white-space:nowrap;}
+.tab.active{background:#fff;color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+
+/* TABLE WRAP */
+.table-wrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1rem;}
+.table-header{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.table-title{font-size:.92rem;font-weight:700;}
+.table-actions{display:flex;align-items:center;gap:8px;}
+.search-input{padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.82rem;font-family:inherit;outline:none;width:220px;}
+.search-input:focus{border-color:var(--green);}
+.btn-refresh{background:var(--green-light);color:var(--green);border:1px solid var(--green-mid);border-radius:var(--radius-sm);padding:7px 14px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-refresh:hover{background:var(--green-mid);}
+table{width:100%;border-collapse:collapse;}
+th{background:#f8fafc;padding:10px 14px;font-size:.73rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 14px;font-size:.84rem;color:var(--text);border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.71rem;font-weight:700;}
+.badge-premium{background:var(--green-light);color:var(--green);}
+.badge-free{background:#f1f5f9;color:var(--text3);}
+.badge-waiting{background:var(--amber-light);color:var(--amber);}
+.badge-verified{background:var(--green-light);color:var(--green);}
+
+/* ACTION BUTTONS */
+.btn-aktif{background:var(--green);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.btn-aktif:hover{opacity:.85;}
+.btn-nonaktif{background:var(--red-light);color:var(--red);border:1px solid var(--red-mid);border-radius:6px;padding:5px 12px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-nonaktif:hover{background:var(--red-mid);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);}
+.empty-state .icon{font-size:2.5rem;margin-bottom:.8rem;}
+.empty-state p{font-size:.88rem;}
+
+/* MANUAL FORM */
+.manual-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1rem;}
+.manual-card h3{font-size:.9rem;font-weight:700;margin-bottom:.4rem;}
+.manual-card p{font-size:.82rem;color:var(--text2);margin-bottom:1rem;line-height:1.5;}
+.form-row{display:flex;gap:10px;align-items:flex-end;}
+.form-row input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.88rem;font-family:inherit;outline:none;}
+.form-row input:focus{border-color:var(--green);}
+.form-result{margin-top:.7rem;font-size:.82rem;min-height:20px;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#fff;border-radius:var(--radius);max-width:400px;width:100%;padding:1.8rem;box-shadow:var(--shadow-md);}
+.modal-title{font-size:1rem;font-weight:700;margin-bottom:.8rem;}
+.modal-body{font-size:.86rem;color:var(--text2);line-height:1.6;margin-bottom:1.2rem;}
+.modal-btns{display:flex;gap:8px;}
+.modal-btns button{flex:1;padding:10px;border-radius:var(--radius-sm);font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;border:none;}
+.btn-confirm-modal{background:var(--green);color:#fff;}
+.btn-cancel-modal{background:#f1f5f9;color:var(--text2);}
+.btn-cancel-modal:hover{background:var(--border);}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:12px 20px;border-radius:var(--radius-sm);font-size:.84rem;font-weight:600;z-index:500;transform:translateY(120px);opacity:0;transition:all .3s ease;max-width:340px;box-shadow:var(--shadow-md);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);color:#fff;}
+.toast.error{background:var(--red);color:#fff;}
+.toast.info{background:#0f172a;color:#fff;}
+
+/* ALERT BOX */
+.alert-waiting{background:var(--amber-light);border:1px solid var(--amber-mid);border-radius:var(--radius-sm);padding:10px 14px;font-size:.83rem;color:#92400e;margin-bottom:1.2rem;display:none;}
+.alert-waiting.show{display:flex;align-items:center;gap:8px;}
+
+@media(max-width:700px){
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .search-input{width:150px;}
+  th:nth-child(3),td:nth-child(3){display:none;}
+  .form-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN GATE ADMIN ══ -->
+<div id="loginGate">
+  <div class="login-box">
+    <svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="55" cy="55" r="53" fill="#F5C518" stroke="#E0A800" stroke-width="1.5"/>
+      <circle cx="55" cy="55" r="40" fill="#C8E6A0"/>
+      <path d="M20 36 Q30 10 55 8 Q42 14 30 30 Z" fill="#CC0000" opacity="0.85"/>
+      <path d="M90 74 Q80 100 55 102 Q68 96 80 80 Z" fill="#CC0000" opacity="0.85"/>
+      <path d="M55 18 C55 18 38 26 38 42 L38 56 C38 66 46 73 55 77 C64 73 72 66 72 56 L72 42 C72 26 55 18 55 18Z" fill="#2E7D32"/>
+      <path d="M55 22 C55 22 42 29 42 43 L42 56 C42 64 49 70 55 74 C61 70 68 64 68 56 L68 43 C68 29 55 22 55 22Z" fill="#43A047"/>
+      <text x="55" y="53" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="15" font-weight="900" fill="#F5C518" letter-spacing="1">CAT</text>
+      <text x="55" y="67" text-anchor="middle" font-family="Arial,sans-serif" font-size="6.5" font-weight="800" fill="#F5C518" letter-spacing="1.5">SIMULASI</text>
+      <circle cx="55" cy="55" r="40" fill="none" stroke="#E0A800" stroke-width="1.5"/>
+      <circle cx="55" cy="55" r="53" fill="none" stroke="#B8860B" stroke-width="1"/>
+    </svg>
+    <h2>Admin Dashboard</h2>
+    <p>Masukkan password untuk mengakses panel admin BelajarSKD</p>
+    <div class="login-field">
+      <label>Password Admin</label>
+      <div class="pass-wrap">
+        <input type="password" id="adminPassInput" placeholder="Masukkan password admin"
+          onkeydown="if(event.key==='Enter')checkAdminPass()">
+        <button class="pass-toggle" onclick="togglePass()">👁</button>
+      </div>
+    </div>
+    <button class="btn-login" onclick="checkAdminPass()">🔐 Masuk Dashboard</button>
+    <div class="login-err" id="loginErr">❌ Password salah. Silakan coba lagi.</div>
+  </div>
+</div>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="55" cy="55" r="53" fill="#F5C518"/>
+      <circle cx="55" cy="55" r="40" fill="#C8E6A0"/>
+      <path d="M55 18 C55 18 38 26 38 42 L38 56 C38 66 46 73 55 77 C64 73 72 66 72 56 L72 42 C72 26 55 18 55 18Z" fill="#2E7D32"/>
+      <text x="55" y="53" text-anchor="middle" font-family="Arial Black,sans-serif" font-size="15" font-weight="900" fill="#F5C518">CAT</text>
+    </svg>
+    BelajarSKD — Admin Dashboard
+  </div>
+  <div class="topbar-right">
+    <span id="clockDisplay"></span>
+    <button class="btn-logout" onclick="doLogout()">Keluar</button>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- ALERT: Ada yang menunggu verifikasi -->
+  <div class="alert-waiting" id="alertWaiting">
+    ⚠️ <strong id="alertWaitingCount"></strong> pembeli menunggu verifikasi transfer — segera proses!
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total User</div>
+      <div class="stat-val" id="statTotal" style="color:var(--blue)">—</div>
+      <div class="stat-sub">Akun terdaftar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">User Premium</div>
+      <div class="stat-val" id="statPremium" style="color:var(--green)">—</div>
+      <div class="stat-sub">Sudah bayar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Menunggu Verifikasi</div>
+      <div class="stat-val" id="statWaiting" style="color:var(--amber)">—</div>
+      <div class="stat-sub">Perlu tindakan anda</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Pendapatan</div>
+      <div class="stat-val" id="statRevenue" style="color:var(--purple)">—</div>
+      <div class="stat-sub">@ Rp25.000 / user</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('users')">👥 Semua User</div>
+    <div class="tab" onclick="switchTab('waiting')">⏳ Menunggu Verifikasi</div>
+    <div class="tab" onclick="switchTab('aktivasi')">⚡ Aktivasi Manual</div>
+  </div>
+
+  <!-- ══ TAB: SEMUA USER ══ -->
+  <div id="tabUsers">
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title">👥 Daftar Semua User</div>
+        <div class="table-actions">
+          <input class="search-input" type="text" id="searchUser"
+            placeholder="Cari nama / email..." oninput="filterUsers()">
+          <button class="btn-refresh" onclick="loadData()">↺ Refresh</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Tanggal Daftar</th>
+              <th>Status</th>
+              <th>Tanggal Bayar</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="6"><div class="empty-state"><div class="icon">⏳</div><p>Memuat data...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: MENUNGGU VERIFIKASI ══ -->
+  <div id="tabWaiting" style="display:none;">
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title">⏳ Konfirmasi Transfer — Menunggu Verifikasi</div>
+        <button class="btn-refresh" onclick="loadData()">↺ Refresh</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Waktu Konfirmasi</th>
+              <th>Jumlah</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="waitingTableBody">
+            <tr><td colspan="6"><div class="empty-state"><div class="icon">⏳</div><p>Memuat data...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: AKTIVASI MANUAL ══ -->
+  <div id="tabAktivasi" style="display:none;">
+
+    <div class="manual-card">
+      <h3>✅ Aktifkan Premium via Email</h3>
+      <p>Masukkan email pembeli yang sudah transfer dan ingin diaktifkan akses premiumnya.</p>
+      <div class="form-row">
+        <input type="email" id="aktivasiEmail" placeholder="email@pembeli.com">
+        <button class="btn-aktif" onclick="aktivasiManual()"
+          style="padding:10px 20px;font-size:.88rem;white-space:nowrap;">
+          ✅ Aktifkan Premium
+        </button>
+      </div>
+      <div class="form-result" id="aktivasiResult"></div>
+    </div>
+
+    <div class="manual-card">
+      <h3>❌ Nonaktifkan Premium via Email</h3>
+      <p>Gunakan ini jika ada pembayaran gagal, refund, atau akun bermasalah.</p>
+      <div class="form-row">
+        <input type="email" id="nonaktifEmail" placeholder="email@pembeli.com">
+        <button class="btn-nonaktif" onclick="nonaktifManual()"
+          style="padding:10px 20px;font-size:.88rem;white-space:nowrap;">
+          ❌ Nonaktifkan
+        </button>
+      </div>
+      <div class="form-result" id="nonaktifResult"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ══ MODAL KONFIRMASI ══ -->
+<div class="modal-overlay" id="modalKonfirmasi">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel-modal" onclick="closeModal()">Batal</button>
+      <button class="btn-confirm-modal" id="modalConfirmBtn">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ══ CONFIG ══
+const SUPABASE_URL = 'https://ivjdkylkvgutxyhuvxmj.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_VZ8NChOK61VKpNN3HcPPfA_OgkFdflC';
+const ADMIN_PASSWORD = 'BSKDadm-GLJxQMc80Q-2025';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+let allUsers = [];
+let allTransaksi = [];
+
+// ══ ADMIN LOGIN ══
+function togglePass() {
+  const inp = document.getElementById('adminPassInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function checkAdminPass() {
+  const pass = document.getElementById('adminPassInput').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('loginGate').classList.add('hide');
+    sessionStorage.setItem('bskd_admin_auth', '1');
+    init();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('adminPassInput').value = '';
+    document.getElementById('adminPassInput').focus();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('bskd_admin_auth');
+  location.reload();
+}
+
+// Cek session agar tidak perlu login ulang saat refresh
+if (sessionStorage.getItem('bskd_admin_auth') === '1') {
+  document.getElementById('loginGate').classList.add('hide');
+  init();
+}
+
+// ══ INIT ══
+function init() {
+  startClock();
+  loadData();
+  // Auto refresh setiap 60 detik
+  setInterval(loadData, 60000);
+}
+
+// ══ CLOCK ══
+function startClock() {
+  function tick() {
+    document.getElementById('clockDisplay').textContent =
+      new Date().toLocaleString('id-ID', {
+        weekday:'short', day:'2-digit', month:'short',
+        hour:'2-digit', minute:'2-digit'
+      });
+  }
+  tick();
+  setInterval(tick, 30000);
+}
+
+// ══ LOAD DATA ══
+async function loadData() {
+  const { data: profiles, error: pErr } = await sb
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  const { data: transaksi } = await sb
+    .from('transaksi')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (pErr) {
+    showToast('Gagal memuat data: ' + pErr.message, 'error');
+    return;
+  }
+
+  allUsers = profiles || [];
+  allTransaksi = transaksi || [];
+
+  updateStats();
+  renderUsersTable(allUsers);
+  renderWaitingTable();
+}
+
+// ══ STATS ══
+function updateStats() {
+  const total = allUsers.length;
+  const premium = allUsers.filter(u => u.status_premium).length;
+  const waiting = allTransaksi.filter(t => t.status === 'menunggu_verifikasi').length;
+  const revenue = premium * 25000;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statPremium').textContent = premium;
+  document.getElementById('statWaiting').textContent = waiting;
+  document.getElementById('statRevenue').textContent =
+    'Rp ' + revenue.toLocaleString('id-ID');
+
+  // Alert jika ada yang menunggu
+  const alertEl = document.getElementById('alertWaiting');
+  if (waiting > 0) {
+    alertEl.classList.add('show');
+    document.getElementById('alertWaitingCount').textContent =
+      waiting + ' pembeli';
+  } else {
+    alertEl.classList.remove('show');
+  }
+}
+
+// ══ RENDER USERS TABLE ══
+function renderUsersTable(users) {
+  const tbody = document.getElementById('usersTableBody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">👤</div><p>Belum ada user terdaftar</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => {
+    const tglDaftar = new Date(u.created_at).toLocaleDateString('id-ID',
+      {day:'2-digit', month:'short', year:'numeric'});
+    const tglBayar = u.tanggal_bayar
+      ? new Date(u.tanggal_bayar).toLocaleDateString('id-ID',
+          {day:'2-digit', month:'short', year:'numeric'})
+      : '—';
+    const badge = u.status_premium
+      ? '<span class="badge badge-premium">✅ Premium</span>'
+      : '<span class="badge badge-free">Free</span>';
+    const aksi = u.status_premium
+      ? `<button class="btn-nonaktif" onclick="showModal('nonaktif','${esc(u.email)}','${esc(u.nama)}')">Nonaktifkan</button>`
+      : `<button class="btn-aktif" onclick="showModal('aktif','${esc(u.email)}','${esc(u.nama)}')">Aktifkan</button>`;
+
+    return `<tr>
+      <td><strong>${esc(u.nama)}</strong></td>
+      <td style="color:var(--text2);font-size:.81rem;">${esc(u.email)}</td>
+      <td style="color:var(--text3);font-size:.79rem;">${tglDaftar}</td>
+      <td>${badge}</td>
+      <td style="color:var(--text3);font-size:.79rem;">${tglBayar}</td>
+      <td>${aksi}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══ RENDER WAITING TABLE ══
+function renderWaitingTable() {
+  const waiting = allTransaksi.filter(t => t.status === 'menunggu_verifikasi');
+  const tbody = document.getElementById('waitingTableBody');
+
+  if (!waiting.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">🎉</div><p>Tidak ada yang menunggu verifikasi</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = waiting.map(t => {
+    const user = allUsers.find(u => u.id === t.user_id);
+    const nama = user ? user.nama : '(tidak ditemukan)';
+    const email = user ? user.email : '—';
+    const tgl = new Date(t.created_at).toLocaleString('id-ID',
+      {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+    const jumlah = 'Rp ' + (t.jumlah || 25000).toLocaleString('id-ID');
+
+    return `<tr>
+      <td style="font-family:monospace;font-size:.76rem;color:var(--text3);">${esc(t.order_id)}</td>
+      <td><strong>${esc(nama)}</strong></td>
+      <td style="font-size:.81rem;color:var(--text2);">${esc(email)}</td>
+      <td style="font-size:.79rem;color:var(--text3);">${tgl}</td>
+      <td style="font-weight:700;color:var(--green);">${jumlah}</td>
+      <td>
+        <button class="btn-aktif"
+          onclick="showModal('verifikasi','${esc(email)}','${esc(nama)}','${esc(t.order_id)}')">
+          ✅ Verifikasi & Aktifkan
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══ FILTER USERS ══
+function filterUsers() {
+  const q = document.getElementById('searchUser').value.toLowerCase();
+  if (!q) { renderUsersTable(allUsers); return; }
+  const filtered = allUsers.filter(u =>
+    (u.nama || '').toLowerCase().includes(q) ||
+    (u.email || '').toLowerCase().includes(q)
+  );
+  renderUsersTable(filtered);
+}
+
+// ══ SWITCH TAB ══
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  ['tabUsers','tabWaiting','tabAktivasi'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+
+  const map = { users: 0, waiting: 1, aktivasi: 2 };
+  document.querySelectorAll('.tab')[map[tab]].classList.add('active');
+  document.getElementById({
+    users: 'tabUsers', waiting: 'tabWaiting', aktivasi: 'tabAktivasi'
+  }[tab]).style.display = 'block';
+}
+
+// ══ MODAL ══
+let pendingAction = null;
+
+function showModal(type, email, nama, orderId) {
+  const titles = {
+    aktif: '✅ Aktifkan Premium',
+    nonaktif: '❌ Nonaktifkan Premium',
+    verifikasi: '✅ Verifikasi & Aktifkan Premium'
+  };
+  const bodies = {
+    aktif: `Aktifkan akses premium untuk:<br><strong>${esc(nama)}</strong><br><span style="color:var(--text3)">${esc(email)}</span>`,
+    nonaktif: `Nonaktifkan akses premium untuk:<br><strong>${esc(nama)}</strong><br><span style="color:var(--text3)">${esc(email)}</span>`,
+    verifikasi: `Verifikasi transfer dan aktifkan premium untuk:<br><strong>${esc(nama)}</strong><br><span style="color:var(--text3)">${esc(email)}</span><br><br>Order ID: <code style="font-size:.78rem">${esc(orderId||'')}</code>`
+  };
+
+  document.getElementById('modalTitle').innerHTML = titles[type];
+  document.getElementById('modalBody').innerHTML = bodies[type];
+
+  if (type === 'nonaktif') {
+    pendingAction = () => doNonaktifkan(email);
+  } else {
+    pendingAction = () => doAktifkan(email, orderId || null);
+  }
+
+  document.getElementById('modalConfirmBtn').onclick = function() {
+    pendingAction();
+    closeModal();
+  };
+  document.getElementById('modalKonfirmasi').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalKonfirmasi').classList.remove('show');
+  pendingAction = null;
+}
+
+// ══ AKTIVASI PREMIUM ══
+async function doAktifkan(email, orderId) {
+  const { data, error } = await sb
+    .from('profiles')
+    .update({
+      status_premium: true,
+      tanggal_bayar: new Date().toISOString(),
+      order_id: orderId || null
+    })
+    .eq('email', email)
+    .select();
+
+  if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
+  if (!data || data.length === 0) {
+    showToast('User tidak ditemukan: ' + email, 'error'); return;
+  }
+
+  if (orderId) {
+    await sb.from('transaksi')
+      .update({ status: 'verified' })
+      .eq('order_id', orderId);
+  }
+
+  showToast('✅ Premium aktif untuk ' + email, 'success');
+  loadData();
+}
+
+async function doNonaktifkan(email) {
+  const { error } = await sb
+    .from('profiles')
+    .update({ status_premium: false, tanggal_bayar: null, order_id: null })
+    .eq('email', email);
+
+  if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
+  showToast('Premium dinonaktifkan untuk ' + email, 'info');
+  loadData();
+}
+
+// ══ AKTIVASI MANUAL FORM ══
+async function aktivasiManual() {
+  const email = document.getElementById('aktivasiEmail').value.trim();
+  const res = document.getElementById('aktivasiResult');
+  if (!email) { res.innerHTML = '<span style="color:var(--red)">⚠️ Email wajib diisi</span>'; return; }
+  res.innerHTML = '<span style="color:var(--text3)">⏳ Memproses...</span>';
+
+  const { data, error } = await sb
+    .from('profiles')
+    .update({ status_premium: true, tanggal_bayar: new Date().toISOString() })
+    .eq('email', email)
+    .select();
+
+  if (error || !data || data.length === 0) {
+    res.innerHTML = '<span style="color:var(--red)">❌ Email tidak ditemukan atau gagal diaktifkan</span>';
+    return;
+  }
+
+  res.innerHTML = `<span style="color:var(--green)">✅ Berhasil! <strong>${esc(data[0].nama)}</strong> sudah Premium.</span>`;
+  document.getElementById('aktivasiEmail').value = '';
+  loadData();
+}
+
+async function nonaktifManual() {
+  const email = document.getElementById('nonaktifEmail').value.trim();
+  const res = document.getElementById('nonaktifResult');
+  if (!email) { res.innerHTML = '<span style="color:var(--red)">⚠️ Email wajib diisi</span>'; return; }
+  res.innerHTML = '<span style="color:var(--text3)">⏳ Memproses...</span>';
+
+  const { error } = await sb
+    .from('profiles')
+    .update({ status_premium: false, tanggal_bayar: null, order_id: null })
+    .eq('email', email);
+
+  if (error) {
+    res.innerHTML = '<span style="color:var(--red)">❌ Gagal: ' + error.message + '</span>';
+    return;
+  }
+
+  res.innerHTML = `<span style="color:var(--amber)">⚠️ Premium dinonaktifkan untuk ${esc(email)}</span>`;
+  document.getElementById('nonaktifEmail').value = '';
+  loadData();
+}
+
+// ══ TOAST ══
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (type || 'info');
+  setTimeout(() => { el.className = 'toast'; }, 3500);
+}
+
+// ══ UTILS ══
+function esc(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+</script>
+</body>
+</html>
