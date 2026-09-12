@@ -327,16 +327,32 @@ tr:hover td{background:#fafafa;}
 <!-- ══ TOAST ══ -->
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ══ CONFIG ══
-const SUPABASE_URL = 'https://ivjdkylkvgutxyhuvxmj.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_VZ8NChOK61VKpNN3HcPPfA_OgkFdflC';
-const ADMIN_PASSWORD = 'BSKDadm-GLJxQMc80Q-2025';
+// GANTI URL INI dengan URL Edge Function Anda setelah deploy:
+// https://<project-ref>.functions.supabase.co/admin-actions
+const ADMIN_FN_URL = 'https://ivjdkylkvgutxyhuvxmj.functions.supabase.co/admin-actions';
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+// PENTING: tidak ada lagi password admin tertulis di sini.
+// Password yang Anda ketik di layar login dikirim ke Edge Function untuk
+// divalidasi di server (dibandingkan dengan secret ADMIN_SECRET),
+// bukan dicocokkan di browser.
+
 let allUsers = [];
 let allTransaksi = [];
+
+// ══ PEMANGGIL EDGE FUNCTION ══
+async function callAdminApi(action, payload = {}) {
+  const token = sessionStorage.getItem('bskd_admin_token');
+  const res = await fetch(ADMIN_FN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-token': token || '' },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  const out = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(out.error || ('Gagal (' + res.status + ')'));
+  return out;
+}
 
 // ══ ADMIN LOGIN ══
 function togglePass() {
@@ -344,13 +360,15 @@ function togglePass() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
-function checkAdminPass() {
+async function checkAdminPass() {
   const pass = document.getElementById('adminPassInput').value;
-  if (pass === ADMIN_PASSWORD) {
+  sessionStorage.setItem('bskd_admin_token', pass);
+  try {
+    await callAdminApi('ping');
     document.getElementById('loginGate').classList.add('hide');
-    sessionStorage.setItem('bskd_admin_auth', '1');
     init();
-  } else {
+  } catch (e) {
+    sessionStorage.removeItem('bskd_admin_token');
     document.getElementById('loginErr').style.display = 'block';
     document.getElementById('adminPassInput').value = '';
     document.getElementById('adminPassInput').focus();
@@ -358,12 +376,14 @@ function checkAdminPass() {
 }
 
 function doLogout() {
-  sessionStorage.removeItem('bskd_admin_auth');
+  sessionStorage.removeItem('bskd_admin_token');
   location.reload();
 }
 
 // Cek session agar tidak perlu login ulang saat refresh
-if (sessionStorage.getItem('bskd_admin_auth') === '1') {
+// (kalau token sudah tidak valid, panggilan API pertama di init() akan gagal
+// dan menampilkan toast error — admin tinggal logout & login ulang)
+if (sessionStorage.getItem('bskd_admin_token')) {
   document.getElementById('loginGate').classList.add('hide');
   init();
 }
@@ -391,27 +411,17 @@ function startClock() {
 
 // ══ LOAD DATA ══
 async function loadData() {
-  const { data: profiles, error: pErr } = await sb
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false });
+  try {
+    const out = await callAdminApi('list');
+    allUsers = out.profiles || [];
+    allTransaksi = out.transaksi || [];
 
-  const { data: transaksi } = await sb
-    .from('transaksi')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (pErr) {
-    showToast('Gagal memuat data: ' + pErr.message, 'error');
-    return;
+    updateStats();
+    renderUsersTable(allUsers);
+    renderWaitingTable();
+  } catch (e) {
+    showToast('Gagal memuat data: ' + e.message, 'error');
   }
-
-  allUsers = profiles || [];
-  allTransaksi = transaksi || [];
-
-  updateStats();
-  renderUsersTable(allUsers);
-  renderWaitingTable();
 }
 
 // ══ STATS ══
@@ -568,40 +578,23 @@ function closeModal() {
 
 // ══ AKTIVASI PREMIUM ══
 async function doAktifkan(email, orderId) {
-  const { data, error } = await sb
-    .from('profiles')
-    .update({
-      status_premium: true,
-      tanggal_bayar: new Date().toISOString(),
-      order_id: orderId || null
-    })
-    .eq('email', email)
-    .select();
-
-  if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
-  if (!data || data.length === 0) {
-    showToast('User tidak ditemukan: ' + email, 'error'); return;
+  try {
+    await callAdminApi('activate', { email, orderId: orderId || null });
+    showToast('✅ Premium aktif untuk ' + email, 'success');
+    loadData();
+  } catch (e) {
+    showToast('Gagal: ' + e.message, 'error');
   }
-
-  if (orderId) {
-    await sb.from('transaksi')
-      .update({ status: 'verified' })
-      .eq('order_id', orderId);
-  }
-
-  showToast('✅ Premium aktif untuk ' + email, 'success');
-  loadData();
 }
 
 async function doNonaktifkan(email) {
-  const { error } = await sb
-    .from('profiles')
-    .update({ status_premium: false, tanggal_bayar: null, order_id: null })
-    .eq('email', email);
-
-  if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
-  showToast('Premium dinonaktifkan untuk ' + email, 'info');
-  loadData();
+  try {
+    await callAdminApi('deactivate', { email });
+    showToast('Premium dinonaktifkan untuk ' + email, 'info');
+    loadData();
+  } catch (e) {
+    showToast('Gagal: ' + e.message, 'error');
+  }
 }
 
 // ══ AKTIVASI MANUAL FORM ══
@@ -611,20 +604,14 @@ async function aktivasiManual() {
   if (!email) { res.innerHTML = '<span style="color:var(--red)">⚠️ Email wajib diisi</span>'; return; }
   res.innerHTML = '<span style="color:var(--text3)">⏳ Memproses...</span>';
 
-  const { data, error } = await sb
-    .from('profiles')
-    .update({ status_premium: true, tanggal_bayar: new Date().toISOString() })
-    .eq('email', email)
-    .select();
-
-  if (error || !data || data.length === 0) {
-    res.innerHTML = '<span style="color:var(--red)">❌ Email tidak ditemukan atau gagal diaktifkan</span>';
-    return;
+  try {
+    const out = await callAdminApi('activate', { email });
+    res.innerHTML = `<span style="color:var(--green)">✅ Berhasil! <strong>${esc(out.user.nama || email)}</strong> sudah Premium.</span>`;
+    document.getElementById('aktivasiEmail').value = '';
+    loadData();
+  } catch (e) {
+    res.innerHTML = '<span style="color:var(--red)">❌ ' + esc(e.message) + '</span>';
   }
-
-  res.innerHTML = `<span style="color:var(--green)">✅ Berhasil! <strong>${esc(data[0].nama)}</strong> sudah Premium.</span>`;
-  document.getElementById('aktivasiEmail').value = '';
-  loadData();
 }
 
 async function nonaktifManual() {
@@ -633,19 +620,14 @@ async function nonaktifManual() {
   if (!email) { res.innerHTML = '<span style="color:var(--red)">⚠️ Email wajib diisi</span>'; return; }
   res.innerHTML = '<span style="color:var(--text3)">⏳ Memproses...</span>';
 
-  const { error } = await sb
-    .from('profiles')
-    .update({ status_premium: false, tanggal_bayar: null, order_id: null })
-    .eq('email', email);
-
-  if (error) {
-    res.innerHTML = '<span style="color:var(--red)">❌ Gagal: ' + error.message + '</span>';
-    return;
+  try {
+    await callAdminApi('deactivate', { email });
+    res.innerHTML = `<span style="color:var(--amber)">⚠️ Premium dinonaktifkan untuk ${esc(email)}</span>`;
+    document.getElementById('nonaktifEmail').value = '';
+    loadData();
+  } catch (e) {
+    res.innerHTML = '<span style="color:var(--red)">❌ Gagal: ' + esc(e.message) + '</span>';
   }
-
-  res.innerHTML = `<span style="color:var(--amber)">⚠️ Premium dinonaktifkan untuk ${esc(email)}</span>`;
-  document.getElementById('nonaktifEmail').value = '';
-  loadData();
 }
 
 // ══ TOAST ══
