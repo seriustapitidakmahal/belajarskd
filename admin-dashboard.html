@@ -331,7 +331,12 @@ tr:hover td{background:#fafafa;}
 // ══ CONFIG ══
 // GANTI URL INI dengan URL Edge Function Anda setelah deploy:
 // https://<project-ref>.functions.supabase.co/admin-actions
-const ADMIN_FN_URL = 'https://ivjdkylkvgutxyhuvxmj.functions.supabase.co/admin-actions';
+const ADMIN_FN_URL = 'https://ivjdkylkvgutxyhuvxmj.supabase.co/functions/v1/admin-actions';
+// Anon/publishable key ini BUKAN rahasia (memang didesain untuk dipakai di
+// browser) — dikirim sebagai header Authorization karena Supabase Edge
+// Functions secara default mewajibkan header itu ada di setiap request,
+// terlepas dari validasi password admin kita sendiri lewat x-admin-token.
+const SUPABASE_ANON = 'sb_publishable_VZ8NChOK61VKpNN3HcPPfA_OgkFdflC';
 
 // PENTING: tidak ada lagi password admin tertulis di sini.
 // Password yang Anda ketik di layar login dikirim ke Edge Function untuk
@@ -346,7 +351,11 @@ async function callAdminApi(action, payload = {}) {
   const token = sessionStorage.getItem('bskd_admin_token');
   const res = await fetch(ADMIN_FN_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-token': token || '' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + SUPABASE_ANON,
+      'x-admin-token': token || '',
+    },
     body: JSON.stringify({ action, ...payload }),
   });
   const out = await res.json().catch(() => ({}));
@@ -369,7 +378,9 @@ async function checkAdminPass() {
     init();
   } catch (e) {
     sessionStorage.removeItem('bskd_admin_token');
-    document.getElementById('loginErr').style.display = 'block';
+    const errEl = document.getElementById('loginErr');
+    errEl.textContent = '❌ Gagal login: ' + e.message;
+    errEl.style.display = 'block';
     document.getElementById('adminPassInput').value = '';
     document.getElementById('adminPassInput').focus();
   }
