@@ -436,17 +436,17 @@ input, textarea, select { font-family: inherit; }
       <div class="subtes-card twk">
         <div class="label">TWK</div>
         <div class="name">Wawasan Kebangsaan</div>
-        <div class="info">30 acak dari 200 · PG 65</div>
+        <div class="info" id="poolInfoTWK">30 acak dari 200 · PG 65</div>
       </div>
       <div class="subtes-card tiu">
         <div class="label">TIU</div>
         <div class="name">Intelegensia Umum</div>
-        <div class="info">35 acak dari 250 · PG 80</div>
+        <div class="info" id="poolInfoTIU">35 acak dari 250 · PG 80</div>
       </div>
       <div class="subtes-card tkp">
         <div class="label">TKP</div>
         <div class="name">Karakteristik Pribadi</div>
-        <div class="info">45 acak dari 200 · PG 166</div>
+        <div class="info" id="poolInfoTKP">45 acak dari 200 · PG 166</div>
       </div>
     </div>
     <div id="userGreeting" style="margin-bottom:1rem;display:none;text-align:center;"></div>
@@ -500,21 +500,21 @@ input, textarea, select { font-family: inherit; }
         <div class="mode-icon" style="background:#eff6ff;">🛡️</div>
         <div>
           <h3>TWK — Wawasan Kebangsaan</h3>
-          <p><strong>30 soal acak</strong> dari 200 bank soal TWK · 30 menit</p>
+          <p><strong>30 soal acak</strong> dari <span id="poolCountTWK">200</span> bank soal TWK · 30 menit</p>
         </div>
       </div>
       <div class="mode-item" onclick="selectMode(this,'tiu')">
         <div class="mode-icon" style="background:#f0fdf4;">🧠</div>
         <div>
           <h3>TIU — Intelegensia Umum</h3>
-          <p><strong>35 soal acak</strong> dari 250 bank soal TIU · 35 menit</p>
+          <p><strong>35 soal acak</strong> dari <span id="poolCountTIU">250</span> bank soal TIU · 35 menit</p>
         </div>
       </div>
       <div class="mode-item" onclick="selectMode(this,'tkp')">
         <div class="mode-icon" style="background:#f5f3ff;">🤝</div>
         <div>
           <h3>TKP — Karakteristik Pribadi</h3>
-          <p><strong>45 soal acak</strong> dari 200 bank soal TKP · 45 menit</p>
+          <p><strong>45 soal acak</strong> dari <span id="poolCountTKP">200</span> bank soal TKP · 45 menit</p>
         </div>
       </div>
     </div>
@@ -792,6 +792,20 @@ async function loadBankSoal() {
     return out;
   });
   bankSoalLoaded = true;
+  updatePoolInfo();
+}
+
+function updatePoolInfo() {
+  const counts = { TWK: 0, TIU: 0, TKP: 0 };
+  bankSoal.forEach(s => { if (counts[s.subtes] !== undefined) counts[s.subtes]++; });
+  const pg = { TWK: 65, TIU: 80, TKP: 166 };
+  const ambil = { TWK: 30, TIU: 35, TKP: 45 };
+  ['TWK','TIU','TKP'].forEach(sub => {
+    const infoEl = document.getElementById('poolInfo' + sub);
+    if (infoEl) infoEl.textContent = `${ambil[sub]} acak dari ${counts[sub]} · PG ${pg[sub]}`;
+    const countEl = document.getElementById('poolCount' + sub);
+    if (countEl) countEl.textContent = counts[sub];
+  });
 }
 let mode = 'full';
 let currentSoal = 0;
