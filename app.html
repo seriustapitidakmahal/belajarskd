@@ -605,7 +605,7 @@ input, textarea, select { font-family: inherit; }
       <div class="form-row">
         <div class="form-group">
           <label>Subtes</label>
-          <select id="adm_subtes">
+          <select id="adm_subtes" onchange="toggleTkpFields()">
             <option value="TWK">TWK — Wawasan Kebangsaan</option>
             <option value="TIU">TIU — Intelegensia Umum</option>
             <option value="TKP">TKP — Karakteristik Pribadi</option>
@@ -630,7 +630,7 @@ input, textarea, select { font-family: inherit; }
           <div class="pilihan-row"><span>E</span><input type="text" id="adm_e" placeholder="Pilihan E"></div>
         </div>
       </div>
-      <div class="form-row">
+      <div class="form-row" id="kunciBobotFields">
         <div class="form-group">
           <label>Kunci Jawaban</label>
           <select id="adm_kunci">
@@ -638,8 +638,18 @@ input, textarea, select { font-family: inherit; }
           </select>
         </div>
         <div class="form-group">
-          <label>Bobot Nilai (TKP: 1-5, TWK/TIU: 5)</label>
+          <label>Bobot Nilai</label>
           <input type="number" id="adm_bobot" value="5" min="1" max="5">
+        </div>
+      </div>
+      <div class="form-group" id="tkpScoreFields" style="display:none;">
+        <label>Skor Tiap Pilihan (WAJIB 1-5, masing-masing HANYA SATU KALI dipakai — 5=paling tepat, 1=paling tidak tepat)</label>
+        <div class="pilihan-inputs">
+          <div class="pilihan-row"><span>A</span><input type="number" id="adm_skor_a" min="1" max="5" placeholder="1-5"></div>
+          <div class="pilihan-row"><span>B</span><input type="number" id="adm_skor_b" min="1" max="5" placeholder="1-5"></div>
+          <div class="pilihan-row"><span>C</span><input type="number" id="adm_skor_c" min="1" max="5" placeholder="1-5"></div>
+          <div class="pilihan-row"><span>D</span><input type="number" id="adm_skor_d" min="1" max="5" placeholder="1-5"></div>
+          <div class="pilihan-row"><span>E</span><input type="number" id="adm_skor_e" min="1" max="5" placeholder="1-5"></div>
         </div>
       </div>
       <div class="form-group">
@@ -1213,6 +1223,12 @@ function closeTips(e) {
 }
 
 // ══════════ ADMIN ══════════
+function toggleTkpFields() {
+  const isTkp = document.getElementById('adm_subtes').value === 'TKP';
+  document.getElementById('tkpScoreFields').style.display = isTkp ? 'block' : 'none';
+  document.getElementById('kunciBobotFields').style.display = isTkp ? 'none' : 'flex';
+}
+
 async function loadSoalAdmin() {
   // Panel admin memakai data yang sama dengan bankSoal (sudah dimuat lewat
   // loadBankSoal() saat login premium) — jadi tidak perlu fetch terpisah.
@@ -1231,6 +1247,16 @@ function fillAdminForm(s) {
   document.getElementById('adm_e').value = (s.pilihan && s.pilihan.E) || '';
   document.getElementById('adm_kunci').value = s.kunci;
   document.getElementById('adm_bobot').value = s.bobot || 5;
+
+  if (s.subtes === 'TKP' && s.skorTkp) {
+    document.getElementById('adm_skor_a').value = s.skorTkp.A ?? '';
+    document.getElementById('adm_skor_b').value = s.skorTkp.B ?? '';
+    document.getElementById('adm_skor_c').value = s.skorTkp.C ?? '';
+    document.getElementById('adm_skor_d').value = s.skorTkp.D ?? '';
+    document.getElementById('adm_skor_e').value = s.skorTkp.E ?? '';
+  }
+  toggleTkpFields();
+
   document.getElementById('adm_pembahasan').value = s.pembahasan || '';
   document.getElementById('adm_tips').value = s.tips || '';
 
@@ -1242,13 +1268,15 @@ function fillAdminForm(s) {
 
 function resetAdminForm() {
   document.getElementById('adm_editing_id').value = '';
-  ['adm_kategori','adm_soal','adm_a','adm_b','adm_c','adm_d','adm_e','adm_pembahasan','adm_tips'].forEach(id => {
+  ['adm_kategori','adm_soal','adm_a','adm_b','adm_c','adm_d','adm_e','adm_pembahasan','adm_tips',
+   'adm_skor_a','adm_skor_b','adm_skor_c','adm_skor_d','adm_skor_e'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('adm_bobot').value = '5';
   document.getElementById('admFormTitle').textContent = '+ Tambah Soal Baru';
   document.getElementById('admSaveBtn').textContent = '+ Simpan Soal';
   document.getElementById('admCancelEditBtn').style.display = 'none';
+  toggleTkpFields();
 }
 
 function editSoal(id) {
@@ -1275,7 +1303,7 @@ async function saveSoal() {
   const c = document.getElementById('adm_c').value.trim();
   const d = document.getElementById('adm_d').value.trim();
   const e = document.getElementById('adm_e').value.trim();
-  const kunci = document.getElementById('adm_kunci').value;
+  const kunciSel = document.getElementById('adm_kunci').value;
   const bobot = parseInt(document.getElementById('adm_bobot').value) || 5;
   const pembahasan = document.getElementById('adm_pembahasan').value.trim();
   const tips = document.getElementById('adm_tips').value.trim();
@@ -1285,13 +1313,33 @@ async function saveSoal() {
     return;
   }
 
+  let kunci = kunciSel;
+  let skorTkp = null;
+
+  if (subtes === 'TKP') {
+    const sA = parseInt(document.getElementById('adm_skor_a').value);
+    const sB = parseInt(document.getElementById('adm_skor_b').value);
+    const sC = parseInt(document.getElementById('adm_skor_c').value);
+    const sD = parseInt(document.getElementById('adm_skor_d').value);
+    const sE = parseInt(document.getElementById('adm_skor_e').value);
+    const arr = [sA, sB, sC, sD, sE];
+    const validSet = arr.every(v => [1,2,3,4,5].includes(v)) && new Set(arr).size === 5;
+    if (!validSet) {
+      alert('Skor TKP wajib diisi angka 1-5, masing-masing HANYA SATU KALI dipakai (contoh: A=5, B=3, C=1, D=4, E=2). Cek lagi isiannya.');
+      return;
+    }
+    skorTkp = { A: sA, B: sB, C: sC, D: sD, E: sE };
+    kunci = ['A','B','C','D','E'][arr.indexOf(5)]; // kunci = opsi dgn skor 5 (terbaik)
+  }
+
   const payload = {
     subtes, kategori: kategori || subtes,
     soal, pilihan: { A: a, B: b, C: c, D: d, E: e },
-    kunci, bobot,
+    kunci, bobot: subtes === 'TKP' ? 5 : bobot,
     pembahasan: pembahasan || 'Jawaban ' + kunci + ' adalah yang paling tepat.',
     tips: tips || 'Baca soal dengan cermat dan eliminasi pilihan yang jelas salah.'
   };
+  if (skorTkp) payload.skorTkp = skorTkp;
 
   try {
     if (editingId) {
@@ -1326,15 +1374,19 @@ function renderAdminList() {
   const list = document.getElementById('adminSoalList');
   document.getElementById('totalSoalAdmin').textContent = bankSoal.length;
   const colors = {TWK:'background:#eff6ff;color:#1d4ed8;',TIU:'background:#f0fdf4;color:#15803d;',TKP:'background:#f5f3ff;color:#6d28d9;'};
-  list.innerHTML = bankSoal.map(s => `
+  list.innerHTML = bankSoal.map(s => {
+    const skorTag = (s.subtes === 'TKP' && s.skorTkp)
+      ? `<span class="tag-sm" style="background:#f5f3ff;color:#6d28d9;">Skor: A${s.skorTkp.A} B${s.skorTkp.B} C${s.skorTkp.C} D${s.skorTkp.D} E${s.skorTkp.E}</span>`
+      : `<span class="tag-sm" style="background:#f0fdf4;color:#15803d;">Kunci: ${s.kunci}</span>
+         <span class="tag-sm" style="background:#fafafa;color:#888;">Bobot: ${s.bobot}</span>`;
+    return `
     <div class="soal-admin-item">
       <div class="soal-admin-meta">
         <div class="soal-admin-q">${s.isFigural ? '🖼️ [Soal Figural] ' : ''}${(s.soal||'').substring(0,120)}${(s.soal||'').length>120?'...':''}</div>
         <div class="soal-admin-tags">
           <span class="tag-sm" style="${colors[s.subtes]}">${s.subtes}</span>
           <span class="tag-sm" style="background:var(--surface2);color:var(--text2);">${s.kategori}</span>
-          <span class="tag-sm" style="background:#f0fdf4;color:#15803d;">Kunci: ${s.kunci}</span>
-          <span class="tag-sm" style="background:#fafafa;color:#888;">Bobot: ${s.bobot}</span>
+          ${skorTag}
         </div>
       </div>
       <div style="display:flex;gap:6px;">
@@ -1342,7 +1394,8 @@ function renderAdminList() {
         <button class="btn-del" onclick="deleteSoal(${s.id})">Hapus</button>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // ══════════ UTILS ══════════
