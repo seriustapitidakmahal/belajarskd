@@ -156,6 +156,7 @@ input, textarea, select { font-family: inherit; }
 .pb-item { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin-bottom: 10px; }
 .pb-item.pb-correct { border-color: var(--green-mid); background: var(--green-light); }
 .pb-item.pb-wrong { border-color: var(--red-mid); background: var(--red-light); }
+.pb-item.pb-partial { border-color: var(--amber-mid); background: var(--amber-light); }
 .pb-num { font-size: .72rem; font-weight: 700; color: var(--text3); margin-bottom: .3rem; }
 .pb-soal { font-size: .87rem; font-weight: 500; line-height: 1.6; margin-bottom: .6rem; }
 .pb-kunci { font-size: .82rem; margin-bottom: .5rem; }
@@ -294,6 +295,7 @@ input, textarea, select { font-family: inherit; }
   .print-soal-item { margin-bottom: 14px; padding: 10px; border: 1px solid #eee; border-radius: 5px; font-size: 12px; }
   .print-soal-item.correct { border-color: #16a34a; background: #f0fdf4; }
   .print-soal-item.wrong { border-color: #dc2626; background: #fef2f2; }
+  .print-soal-item.partial { border-color: #d97706; background: #fffbeb; }
 }
 #printArea { display: none; }
 
@@ -789,6 +791,7 @@ async function loadBankSoal() {
     };
     if (s.figural) out.figural = s.figural;
     if (s.is_figural) out.isFigural = true;
+    if (s.skor_tkp) out.skorTkp = s.skor_tkp;
     return out;
   });
   bankSoalLoaded = true;
@@ -1058,8 +1061,12 @@ function showResult() {
     if (s.subtes === 'TWK') twkScore += benar ? 5 : 0;
     if (s.subtes === 'TIU') tiuScore += benar ? 5 : 0;
     if (s.subtes === 'TKP') {
-      if (benar) tkpScore += 5;
-      else tkpScore += [1,2,3,4][Math.floor(Math.random()*4)];
+      if (s.skorTkp && s.skorTkp[jawaban[i]] != null) {
+        tkpScore += s.skorTkp[jawaban[i]];
+      } else {
+        // fallback untuk soal TKP lama yang belum punya skor_tkp di database
+        tkpScore += benar ? 5 : [1,2,3,4][Math.floor(Math.random()*4)];
+      }
     }
   });
 
@@ -1115,11 +1122,22 @@ function showResult() {
   if (tiuSoal.length) scoreMap['TIU'] = tiuScore;
   if (tkpSoal.length) scoreMap['TKP'] = tkpScore;
 
-  const soalDetail = examSoal.map((s, i) => ({
-    subtes: s.subtes, kategori: s.kategori, soal: s.soal,
-    jawaban: jawaban[i] || '', kunci: s.kunci,
-    pembahasan: s.pembahasan, tips: s.tips
-  }));
+  const soalDetail = examSoal.map((s, i) => {
+    const jwb = jawaban[i] || '';
+    let skorDapat = 0;
+    if (jwb) {
+      if (s.subtes === 'TKP') {
+        skorDapat = s.skorTkp && s.skorTkp[jwb] != null ? s.skorTkp[jwb] : (jwb === s.kunci ? 5 : 0);
+      } else {
+        skorDapat = jwb === s.kunci ? 5 : 0;
+      }
+    }
+    return {
+      subtes: s.subtes, kategori: s.kategori, soal: s.soal,
+      jawaban: jwb, kunci: s.kunci, skorDapat: skorDapat,
+      pembahasan: s.pembahasan, tips: s.tips
+    };
+  });
 
   lastResult = {
     date: dateStr, time: timeStr, mode: modeLabel,
@@ -1155,23 +1173,30 @@ function showPembahasan() {
   list.innerHTML = '';
   examSoal.forEach((s, i) => {
     const userAns = jawaban[i];
-    const benar = userAns === s.kunci;
-    const cls = userAns ? (benar ? 'pb-correct' : 'pb-wrong') : '';
+    let cls = '';
+    let statusHtml = '';
 
-    let soalDisplay = s.soal;
-    let pilihanDisplay = '';
-
-    if (s.isFigural) {
-      soalDisplay = `<em>[Soal Figural — ${s.kategori}]</em> ${s.soal}`;
-      pilihanDisplay = `<div style="font-size:.8rem;color:var(--text2);margin-top:4px;">Jawaban kamu: <strong>${userAns || '(tidak dijawab)'}</strong> · Kunci: <strong style="color:var(--green);">${s.kunci}</strong></div>`;
+    if (s.subtes === 'TKP') {
+      const skor = userAns ? (s.skorTkp ? (s.skorTkp[userAns] ?? 0) : (userAns === s.kunci ? 5 : 0)) : 0;
+      cls = userAns ? (skor >= 4 ? 'pb-correct' : (skor <= 2 ? 'pb-wrong' : 'pb-partial')) : '';
+      const skorColor = skor >= 4 ? 'var(--green)' : (skor <= 2 ? 'var(--red)' : 'var(--amber)');
+      statusHtml = `<div class="pb-kunci">Jawaban kamu: <span>${userAns || '(tidak dijawab)'}</span> · Skor: <span style="color:${skorColor};font-weight:700;">${skor}/5</span> · Jawaban terbaik: <span style="color:var(--green);">${s.kunci}</span></div>`;
     } else {
-      pilihanDisplay = `<div class="pb-kunci">Jawaban kamu: <span>${userAns || '(tidak dijawab)'}</span> · Kunci: <span style="color:var(--green);">${s.kunci}</span> · ${s.pilihan[s.kunci]}</div>`;
+      const benar = userAns === s.kunci;
+      cls = userAns ? (benar ? 'pb-correct' : 'pb-wrong') : '';
+      if (s.isFigural) {
+        statusHtml = `<div style="font-size:.8rem;color:var(--text2);margin-top:4px;">Jawaban kamu: <strong>${userAns || '(tidak dijawab)'}</strong> · Kunci: <strong style="color:var(--green);">${s.kunci}</strong></div>`;
+      } else {
+        statusHtml = `<div class="pb-kunci">Jawaban kamu: <span>${userAns || '(tidak dijawab)'}</span> · Kunci: <span style="color:var(--green);">${s.kunci}</span> · ${s.pilihan[s.kunci]}</div>`;
+      }
     }
+
+    const soalDisplay = s.isFigural ? `<em>[Soal Figural — ${s.kategori}]</em> ${s.soal}` : s.soal;
 
     list.innerHTML += `<div class="pb-item ${cls}">
       <div class="pb-num">Soal ${i+1} · ${s.subtes} · ${s.kategori}</div>
       <div class="pb-soal">${soalDisplay}</div>
-      ${pilihanDisplay}
+      ${statusHtml}
       <div class="pb-tips">💡 <strong>Pembahasan:</strong> ${s.pembahasan}<br><br>🎯 <strong>Tips:</strong> ${s.tips}</div>
     </div>`;
   });
@@ -1511,11 +1536,16 @@ function exportPrint() {
   }).join('');
 
   const soalItems = r.soalDetail.map((s, i) => {
-    const benar = s.jawaban === s.kunci;
-    return `<div class="print-soal-item ${benar?'correct':'wrong'}">
+    const isTkp = s.subtes === 'TKP';
+    const skor = s.skorDapat != null ? s.skorDapat : (s.jawaban === s.kunci ? 5 : 0);
+    const statusClass = isTkp ? (skor >= 4 ? 'correct' : (skor <= 2 ? 'wrong' : 'partial')) : (s.jawaban === s.kunci ? 'correct' : 'wrong');
+    const jawabanLine = isTkp
+      ? `Jawaban Anda: <strong>${s.jawaban||'(tidak dijawab)'}</strong> | Skor: <strong>${skor}/5</strong> | Terbaik: <strong style="color:#16a34a">${s.kunci}</strong>`
+      : `Jawaban Anda: <strong>${s.jawaban||'(tidak dijawab)'}</strong> | Kunci: <strong style="color:#16a34a">${s.kunci}</strong>`;
+    return `<div class="print-soal-item ${statusClass}">
       <strong>Soal ${i+1} [${s.subtes}] ${s.kategori}</strong><br>
       ${s.soal}<br>
-      <small>Jawaban Anda: <strong>${s.jawaban||'(tidak dijawab)'}</strong> | Kunci: <strong style="color:#16a34a">${s.kunci}</strong></small><br>
+      <small>${jawabanLine}</small><br>
       <small style="color:#555">${s.pembahasan}</small>
     </div>`;
   }).join('');
@@ -1537,12 +1567,12 @@ function exportCSV() {
   if (!lastResult) { alert('Tidak ada hasil untuk diekspor.'); return; }
   closeExport();
   const r = lastResult;
-  const headers = ['No','Subtes','Kategori','Soal','Jawaban Anda','Kunci','Benar/Salah','Pembahasan'];
+  const headers = ['No','Subtes','Kategori','Soal','Jawaban Anda','Kunci/Terbaik','Skor','Pembahasan'];
   const rows = r.soalDetail.map((s, i) => [
     i+1, s.subtes, s.kategori,
     '"' + s.soal.replace(/"/g,'""') + '"',
     s.jawaban || '(kosong)', s.kunci,
-    s.jawaban === s.kunci ? 'BENAR' : 'SALAH',
+    (s.skorDapat != null ? s.skorDapat : (s.jawaban === s.kunci ? 5 : 0)) + '/5',
     '"' + s.pembahasan.replace(/"/g,'""') + '"'
   ].join(','));
   const csv = [headers.join(','), ...rows].join('\n');
@@ -1768,11 +1798,16 @@ function exportPrint() {
     </div>`;
   }).join('');
   const soalItems = r.soalDetail.map((s, i) => {
-    const benar = s.jawaban === s.kunci;
-    return `<div class="print-soal-item ${benar?'correct':'wrong'}">
+    const isTkp = s.subtes === 'TKP';
+    const skor = s.skorDapat != null ? s.skorDapat : (s.jawaban === s.kunci ? 5 : 0);
+    const statusClass = isTkp ? (skor >= 4 ? 'correct' : (skor <= 2 ? 'wrong' : 'partial')) : (s.jawaban === s.kunci ? 'correct' : 'wrong');
+    const jawabanLine = isTkp
+      ? `Jawaban Anda: <strong>${s.jawaban||'(tidak dijawab)'}</strong> | Skor: <strong>${skor}/5</strong> | Terbaik: <strong style="color:#16a34a">${s.kunci}</strong>`
+      : `Jawaban Anda: <strong>${s.jawaban||'(tidak dijawab)'}</strong> | Kunci: <strong style="color:#16a34a">${s.kunci}</strong>`;
+    return `<div class="print-soal-item ${statusClass}">
       <strong>Soal ${i+1} [${s.subtes}] ${s.kategori}</strong><br>
       ${s.soal}<br>
-      <small>Jawaban Anda: <strong>${s.jawaban||'(tidak dijawab)'}</strong> | Kunci: <strong style="color:#16a34a">${s.kunci}</strong></small><br>
+      <small>${jawabanLine}</small><br>
       <small style="color:#555">${s.pembahasan}</small>
     </div>`;
   }).join('');
@@ -1797,13 +1832,13 @@ function exportCSV() {
   const user = getCurrentUser();
   const nama = user ? user.nama : 'Anonim';
   const instansi = user ? (user.instansi || '') : '';
-  const headers = ['Nama','Instansi','Tanggal','Mode','No','Subtes','Kategori','Soal','Jawaban Anda','Kunci','Benar/Salah','Pembahasan'];
+  const headers = ['Nama','Instansi','Tanggal','Mode','No','Subtes','Kategori','Soal','Jawaban Anda','Kunci/Terbaik','Skor','Pembahasan'];
   const rows = r.soalDetail.map((s, i) => [
     nama, instansi, r.date, r.mode,
     i+1, s.subtes, s.kategori,
     '"' + s.soal.replace(/"/g,'""') + '"',
     s.jawaban || '(kosong)', s.kunci,
-    s.jawaban === s.kunci ? 'BENAR' : 'SALAH',
+    (s.skorDapat != null ? s.skorDapat : (s.jawaban === s.kunci ? 5 : 0)) + '/5',
     '"' + s.pembahasan.replace(/"/g,'""') + '"'
   ].join(','));
   const csv = [headers.join(','), ...rows].join('\n');
