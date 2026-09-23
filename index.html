@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BelajarSKD — Murah Tapi Bermutu</title>
-<meta name="description" content="Platform simulasi CAT SKD CPNS terlengkap. 650 soal, 3 subtes, soal figural SVG. Gratis 50 soal, premium terjangkau."/>
+<meta name="description" content="Platform simulasi CAT SKD CPNS terlengkap. 1000 soal, 3 subtes, soal figural SVG. Gratis 50 soal, premium terjangkau."/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -238,11 +238,24 @@
     font-family: 'Instrument Serif', serif;
     font-size: 1.8rem; margin-bottom: .5rem;
   }
-  .demo-wrap p { color: rgba(255,255,255,.75); font-size: .9rem; margin-bottom: 1.5rem; }
+  .demo-wrap > p { color: rgba(255,255,255,.75); font-size: .9rem; margin-bottom: 1.5rem; }
+  .demo-tabs {
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 1.2rem;
+    flex-wrap: wrap; position: relative; z-index: 1;
+  }
+  .demo-tab {
+    background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.25);
+    color: rgba(255,255,255,.8); border-radius: 20px; padding: 7px 16px;
+    font-size: .8rem; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: all .15s;
+  }
+  .demo-tab:hover { background: rgba(255,255,255,.18); }
+  .demo-tab.active { background: var(--emas); border-color: var(--emas); color: #111; }
   .demo-soal-preview {
     background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
     border-radius: var(--r); padding: 1.2rem; text-align: left;
     margin-bottom: 1.2rem; backdrop-filter: blur(4px);
+    position: relative; z-index: 1;
   }
   .demo-badge {
     display: inline-block; background: var(--emas); color: #111;
@@ -264,6 +277,30 @@
     justify-content: center; font-size: .72rem; font-weight: 700; flex-shrink: 0;
   }
   .demo-opt.correct .demo-opt-key { background: var(--hijau-md); }
+  .demo-pembahasan { font-size: .8rem; color: rgba(255,255,255,.6); position: relative; z-index: 1; }
+  /* figural */
+  .demo-figural-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: .4rem 0 1rem; flex-wrap: wrap; }
+  .demo-figural-item { background: rgba(255,255,255,.9); border-radius: 8px; padding: 4px; display: flex; flex-direction: column; align-items: center; }
+  .demo-figural-item svg { display: block; }
+  .demo-figural-item span { font-size: .65rem; color: #333; margin-top: 2px; }
+  .demo-figural-sep { font-weight: 800; color: rgba(255,255,255,.8); font-size: 1rem; }
+  .demo-opts-figural { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: .6rem; }
+  .demo-opt-fig { background: rgba(255,255,255,.9); border: 2px solid transparent; border-radius: 8px; padding: 4px; text-align: center; }
+  .demo-opt-fig.correct { border-color: var(--hijau-md); box-shadow: 0 0 0 2px rgba(46,139,87,.4); }
+  .demo-opt-fig svg { display: block; margin: 0 auto; }
+  .demo-opt-fig span { font-size: .65rem; color: #333; font-weight: 700; }
+  /* TKP skor */
+  .demo-opt-skor { justify-content: space-between; }
+  .skor-badge {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 800; color: #fff;
+  }
+  .skor-5 { background: #16a34a; }
+  .skor-4 { background: #4ade80; color: #14532d; }
+  .skor-3 { background: #d97706; }
+  .skor-2 { background: #f97316; }
+  .skor-1 { background: #dc2626; }
 
   /* ── HARGA ── */
   .harga-grid {
@@ -402,6 +439,8 @@
     .hero-stat { padding: 14px 16px; }
     .demo-wrap { padding: 1.8rem 1.2rem; }
     .harga-grid { grid-template-columns: 1fr; }
+    .demo-opts-figural { grid-template-columns: repeat(3, 1fr); }
+    .demo-figural-row { gap: 6px; }
   }
 </style>
 </head>
@@ -419,7 +458,7 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">🏆 Platform Simulasi CAT SKD CPNS · <span>650 Soal Lengkap</span></div>
+  <div class="hero-badge">🏆 Platform Simulasi CAT SKD CPNS · <span>1000 Soal Lengkap</span></div>
   <h1>Latihan SKD CPNS<br><em>Serius, Tapi Tidak Mahal</em></h1>
   <p class="hero-sub">Simulasi CAT yang benar-benar mirip ujian asli BKN — lengkap TWK, TIU, TKP dengan soal figural, timer, dan pembahasan mendalam.</p>
   <div class="hero-btns">
@@ -428,7 +467,7 @@
   </div>
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="hero-stat-num">650</div>
+      <div class="hero-stat-num">1000</div>
       <div class="hero-stat-label">Bank Soal Lengkap</div>
     </div>
     <div class="hero-stat">
@@ -494,8 +533,8 @@
       </div>
       <div class="fitur-card">
         <div class="fitur-icon">📚</div>
-        <h3>650 Bank Soal Terverifikasi</h3>
-        <p>TWK 200 soal, TIU 250 soal, TKP 200 soal. Soal diperbarui secara berkala mengikuti pola ujian terbaru.</p>
+        <h3>1000 Bank Soal Terverifikasi</h3>
+        <p>TWK 300 soal, TIU 400 soal, TKP 300 soal. Soal diperbarui secara berkala mengikuti pola ujian terbaru.</p>
         <span class="fitur-tag premium">Premium</span>
       </div>
       <div class="fitur-card">
@@ -531,24 +570,79 @@
   <div class="container">
     <div class="demo-wrap">
       <h3>Lihat Contoh Soalnya</h3>
-      <p>Ini tampilan nyata soal di dalam BelajarSKD</p>
-      <div class="demo-soal-preview">
-        <span class="demo-badge">TIU · Analogi Verbal</span>
-        <p class="demo-soal-text">🕐 Soal 12 dari 35 &nbsp;|&nbsp; Waktu tersisa: 23:47<br><br>
-        <strong>Dokter : Stetoskop = Petani : ...</strong><br>
-        Tentukan pasangan yang memiliki hubungan yang sama.</p>
+      <p>Ini tampilan nyata soal di dalam BelajarSKD — mencakup TWK, TIU figural, dan TKP dengan skor 1-5 asli</p>
+
+      <div class="demo-tabs">
+        <button class="demo-tab active" onclick="showDemo('twk', this)">TWK</button>
+        <button class="demo-tab" onclick="showDemo('tiu', this)">TIU · Figural</button>
+        <button class="demo-tab" onclick="showDemo('tkp', this)">TKP · Skor 1-5</button>
+      </div>
+
+      <!-- TWK -->
+      <div class="demo-soal-preview" id="demo-twk">
+        <span class="demo-badge">TWK · Integritas</span>
+        <p class="demo-soal-text">🕐 Soal 7 dari 30 &nbsp;|&nbsp; Waktu tersisa: 26:04<br><br>
+        Selama masa perkuliahan daring, seorang mahasiswa sering meminta temannya untuk mengisikan presensi kehadiran di sistem akademik kampus atas namanya, padahal ia sendiri sedang tidur atau bermain gim. Kebiasaan menitipkan absen tersebut merupakan bentuk pelanggaran...</p>
         <div class="demo-opts">
-          <div class="demo-opt"><span class="demo-opt-key">A</span> Ladang</div>
-          <div class="demo-opt correct"><span class="demo-opt-key">B</span> Cangkul ✓</div>
-          <div class="demo-opt"><span class="demo-opt-key">C</span> Pupuk</div>
-          <div class="demo-opt"><span class="demo-opt-key">D</span> Sawah</div>
-          <div class="demo-opt"><span class="demo-opt-key">E</span> Panen</div>
+          <div class="demo-opt"><span class="demo-opt-key">A</span> Kolaborasi</div>
+          <div class="demo-opt"><span class="demo-opt-key">B</span> Kepedulian sosial</div>
+          <div class="demo-opt"><span class="demo-opt-key">C</span> Efisiensi waktu</div>
+          <div class="demo-opt correct"><span class="demo-opt-key">D</span> Integritas dan kejujuran ✓</div>
+          <div class="demo-opt"><span class="demo-opt-key">E</span> Kompetensi</div>
         </div>
       </div>
-      <p style="font-size:.8rem;color:rgba(255,255,255,.6);">💡 <em>Pembahasan: Dokter menggunakan stetoskop sebagai alat kerja utama. Petani menggunakan cangkul sebagai alat kerja utamanya.</em></p>
+      <p class="demo-pembahasan" id="pb-twk">💡 <em>Titip absen adalah bentuk kecurangan kecil yang tetap mencederai nilai kejujuran dan integritas.</em></p>
+
+      <!-- TIU FIGURAL -->
+      <div class="demo-soal-preview" id="demo-tiu" style="display:none;">
+        <span class="demo-badge">TIU · Analogi Figural</span>
+        <p class="demo-soal-text">🕐 Soal 32 dari 35 &nbsp;|&nbsp; Waktu tersisa: 18:22<br><br>
+        Perhatikan hubungan gambar 1 &amp; 2, tentukan gambar yang punya hubungan sama untuk gambar 3:</p>
+        <div class="demo-figural-row">
+          <div class="demo-figural-item"><svg width="50" height="50" viewBox="0 0 60 60"><polygon points="30.0,12.0 47.1,24.4 40.6,44.6 19.4,44.6 12.9,24.4" fill="none" stroke="#334155" stroke-width="2.5"/></svg><span>1</span></div>
+          <span class="demo-figural-sep">:</span>
+          <div class="demo-figural-item"><svg width="50" height="50" viewBox="0 0 60 60"><polygon points="30.0,18.0 41.4,26.3 37.1,39.7 22.9,39.7 18.6,26.3" fill="none" stroke="#334155" stroke-width="2.5"/></svg><span>2</span></div>
+          <span class="demo-figural-sep">→</span>
+          <div class="demo-figural-item"><svg width="50" height="50" viewBox="0 0 60 60"><circle cx="30" cy="30" r="18" fill="none" stroke="#334155" stroke-width="2.5"/></svg><span>3</span></div>
+          <span class="demo-figural-sep">→ ?</span>
+        </div>
+        <div class="demo-opts-figural">
+          <div class="demo-opt-fig"><svg width="42" height="42" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#334155" stroke-width="2.5"/></svg><span>A</span></div>
+          <div class="demo-opt-fig"><svg width="42" height="42" viewBox="0 0 60 60"><circle cx="22" cy="30" r="13" fill="none" stroke="#334155" stroke-width="2.5"/><circle cx="38" cy="30" r="13" fill="none" stroke="#334155" stroke-width="2.5"/></svg><span>B</span></div>
+          <div class="demo-opt-fig"><svg width="42" height="42" viewBox="0 0 60 60"><circle cx="30" cy="30" r="18" fill="#334155" stroke="#334155" stroke-width="2.5"/></svg><span>C</span></div>
+          <div class="demo-opt-fig correct"><svg width="42" height="42" viewBox="0 0 60 60"><circle cx="30" cy="30" r="12" fill="none" stroke="#334155" stroke-width="2.5"/></svg><span>D ✓</span></div>
+          <div class="demo-opt-fig"><svg width="42" height="42" viewBox="0 0 60 60"><circle cx="30" cy="30" r="18" fill="none" stroke="#334155" stroke-width="2.5"/></svg><span>E</span></div>
+        </div>
+      </div>
+      <p class="demo-pembahasan" id="pb-tiu" style="display:none;">💡 <em>Pola: gambar 1→2 (segilima diperkecil) diterapkan sama ke gambar 3 (lingkaran) → jawaban D (lingkaran lebih kecil).</em></p>
+
+      <!-- TKP -->
+      <div class="demo-soal-preview" id="demo-tkp" style="display:none;">
+        <span class="demo-badge">TKP · Pelayanan Publik</span>
+        <p class="demo-soal-text">Hasil survei kepuasan masyarakat di unit kerja Anda menurun signifikan, banyak keluhan soal lamanya waktu tunggu. Sebagai bagian tim, apa langkah paling tepat?</p>
+        <div class="demo-opts">
+          <div class="demo-opt demo-opt-skor"><span><span class="demo-opt-key">A</span> Menunggu instruksi dari pusat tanpa inisiatif</span><span class="skor-badge skor-4">4</span></div>
+          <div class="demo-opt demo-opt-skor"><span><span class="demo-opt-key">B</span> Mengabaikan hasil survei tersebut</span><span class="skor-badge skor-3">3</span></div>
+          <div class="demo-opt demo-opt-skor"><span><span class="demo-opt-key">C</span> Menyalahkan warga yang mengisi survei</span><span class="skor-badge skor-2">2</span></div>
+          <div class="demo-opt demo-opt-skor"><span><span class="demo-opt-key">D</span> Menyembunyikan hasil survei dari pimpinan</span><span class="skor-badge skor-1">1</span></div>
+          <div class="demo-opt demo-opt-skor correct"><span><span class="demo-opt-key">E</span> Evaluasi bersama tim, cari akar masalah ✓</span><span class="skor-badge skor-5">5</span></div>
+        </div>
+      </div>
+      <p class="demo-pembahasan" id="pb-tkp" style="display:none;">💡 <em>Semua pilihan TKP dapat poin (1-5) sesuai kualitas sikap — bukan cuma benar/salah seperti TWK & TIU.</em></p>
     </div>
   </div>
 </div>
+
+<script>
+function showDemo(which, btn) {
+  ['twk','tiu','tkp'].forEach(function(k) {
+    document.getElementById('demo-' + k).style.display = (k === which) ? 'block' : 'none';
+    document.getElementById('pb-' + k).style.display = (k === which) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.demo-tab').forEach(function(t) { t.classList.remove('active'); });
+  btn.classList.add('active');
+}
+</script>
 
 <!-- HARGA -->
 <div class="fitur-bg full-section" id="harga">
@@ -569,7 +663,7 @@
           <li>Simulasi mini dengan timer</li>
           <li>Pembahasan & tips tiap soal</li>
           <li>Akses tanpa daftar akun</li>
-          <li class="no">650 soal bank penuh</li>
+          <li class="no">1000 soal bank penuh</li>
           <li class="no">Soal figural SVG</li>
           <li class="no">Riwayat & grafik nilai</li>
           <li class="no">Soal update berkala</li>
@@ -585,7 +679,7 @@
         <div class="harga-harga">Rp25.000 <span>/ akses penuh</span></div>
         <div class="harga-desc">Bayar sekali, pakai selamanya — lebih murah dari 1 buku soal CPNS</div>
         <ul class="harga-list">
-          <li>650 soal bank lengkap & terverifikasi</li>
+          <li>1000 soal bank lengkap & terverifikasi</li>
           <li>Simulasi penuh 110 soal · 90 menit</li>
           <li>Soal figural interaktif (SVG)</li>
           <li>Riwayat nilai & grafik perkembangan</li>
@@ -649,7 +743,7 @@
       </details>
       <details class="faq-item">
         <summary class="faq-q">Apa bedanya versi Gratis dan Premium?</summary>
-        <p class="faq-a">Versi gratis memberikan akses 50 soal pilihan (15 TWK, 15 TIU, 20 TKP) untuk merasakan kualitas platform. Versi Premium membuka akses penuh ke 650 soal, soal figural visual, dan tracking riwayat nilai.</p>
+        <p class="faq-a">Versi gratis memberikan akses 50 soal pilihan (15 TWK, 15 TIU, 20 TKP) untuk merasakan kualitas platform. Versi Premium membuka akses penuh ke 1000 soal, soal figural visual, dan tracking riwayat nilai.</p>
       </details>
       <details class="faq-item">
         <summary class="faq-q">Apakah perlu install aplikasi?</summary>
