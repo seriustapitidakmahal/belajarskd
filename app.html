@@ -374,7 +374,7 @@ input, textarea, select { font-family: inherit; }
         <circle cx="55" cy="55" r="53" fill="none" stroke="#B8860B" stroke-width="1"/>
       </svg>
       <div class="auth-gate-title" id="gateTitle">Akses Premium Diperlukan</div>
-      <div class="auth-gate-sub" id="gateSub">Login untuk mengakses 650 soal CAT CPNS lengkap dengan soal figural SVG interaktif.</div>
+      <div class="auth-gate-sub" id="gateSub">Login untuk mengakses 1000 soal CAT CPNS lengkap dengan soal figural SVG interaktif.</div>
       <div class="auth-gate-user" id="gateUserInfo" style="display:none;"></div>
       <a href="login.html" class="auth-gate-btn" id="gateBtnLogin">🔐 Login / Daftar Akun</a>
       <a href="bayar.html" class="auth-gate-btn" id="gateBtnBayar" style="display:none;">💳 Aktifkan Premium — Rp25.000</a>
@@ -730,7 +730,7 @@ async function checkAuth() {
 
   if (!session) {
     document.getElementById('gateTitle').textContent = 'Login Diperlukan';
-    document.getElementById('gateSub').textContent = 'Silakan login atau daftar untuk mengakses 650 soal CAT CPNS.';
+    document.getElementById('gateSub').textContent = 'Silakan login atau daftar untuk mengakses 1000 soal CAT CPNS.';
     document.getElementById('gateBtnLogin').style.display = 'block';
     document.getElementById('gateBtnBayar').style.display = 'none';
     return;
@@ -750,7 +750,7 @@ async function checkAuth() {
 
   if (!profile.status_premium) {
     document.getElementById('gateTitle').textContent = 'Akses Premium Diperlukan';
-    document.getElementById('gateSub').textContent = 'Akun sudah terdaftar! Selesaikan pembayaran untuk membuka 650 soal.';
+    document.getElementById('gateSub').textContent = 'Akun sudah terdaftar! Selesaikan pembayaran untuk membuka 1000 soal.';
     document.getElementById('gateUserInfo').style.display = 'block';
     document.getElementById('gateUserInfo').textContent = '👤 ' + (profile.nama || session.user.email);
     document.getElementById('gateBtnLogin').style.display = 'none';
@@ -758,8 +758,8 @@ async function checkAuth() {
     return;
   }
 
-  // ✅ Login + Premium — muat 650 soal dari Supabase dulu sebelum buka akses
-  document.getElementById('gateSub').textContent = 'Memuat 650 soal...';
+  // ✅ Login + Premium — muat 1000 soal dari Supabase dulu sebelum buka akses
+  document.getElementById('gateSub').textContent = 'Memuat 1000 soal...';
   await loadBankSoal();
 
   document.getElementById('authGate').classList.remove('show');
