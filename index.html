@@ -73,10 +73,19 @@
     background: var(--hijau); color: #fff;
     border: none; border-radius: var(--r); padding: 9px 20px;
     font-weight: 700; font-size: .85rem; cursor: pointer;
-    text-decoration: none;
+    text-decoration: none; white-space: nowrap;
     transition: background .15s, transform .1s;
   }
   .nav-cta:hover { background: var(--hijau-md); transform: translateY(-1px); }
+  .nav-actions { display: flex; align-items: center; gap: 8px; }
+  .nav-cta-premium {
+    background: var(--emas); color: #111;
+    border: none; border-radius: var(--r); padding: 9px 16px;
+    font-weight: 800; font-size: .85rem; cursor: pointer;
+    text-decoration: none; white-space: nowrap;
+    transition: background .15s, transform .1s;
+  }
+  .nav-cta-premium:hover { background: #c2910f; transform: translateY(-1px); }
 
   /* ── HERO ── */
   .hero {
@@ -441,6 +450,10 @@
     .harga-grid { grid-template-columns: 1fr; }
     .demo-opts-figural { grid-template-columns: repeat(3, 1fr); }
     .demo-figural-row { gap: 6px; }
+    .nav-cta, .nav-cta-premium { padding: 7px 10px; font-size: .72rem; }
+    .nav-actions { gap: 5px; }
+    .nav-name { font-size: .95rem; }
+    nav { padding: 0 .8rem; }
   }
 </style>
 </head>
@@ -453,7 +466,10 @@
     <span class="nav-name">BelajarSKD</span>
     <span class="nav-tag">Murah Tapi Bermutu</span>
   </a>
-  <a class="nav-cta" href="soal-gratis.html">Coba Gratis</a>
+  <div class="nav-actions">
+    <a class="nav-cta-premium" href="login.html">💎 Premium 25K</a>
+    <a class="nav-cta" href="soal-gratis.html">Coba Gratis</a>
+  </div>
 </nav>
 
 <!-- HERO -->
