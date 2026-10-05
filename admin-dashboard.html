@@ -439,7 +439,7 @@ async function loadData() {
 function updateStats() {
   const total = allUsers.length;
   const premium = allUsers.filter(u => u.status_premium).length;
-  const waiting = allTransaksi.filter(t => t.status === 'menunggu_verifikasi').length;
+  const waiting = allTransaksi.filter(t => t.status === 'menunggu_verifikasi' || t.status === 'pending_review').length;
   const revenue = premium * 25000;
 
   document.getElementById('statTotal').textContent = total;
@@ -494,7 +494,7 @@ function renderUsersTable(users) {
 
 // ══ RENDER WAITING TABLE ══
 function renderWaitingTable() {
-  const waiting = allTransaksi.filter(t => t.status === 'menunggu_verifikasi');
+  const waiting = allTransaksi.filter(t => t.status === 'menunggu_verifikasi' || t.status === 'pending_review');
   const tbody = document.getElementById('waitingTableBody');
 
   if (!waiting.length) {
@@ -509,10 +509,13 @@ function renderWaitingTable() {
     const tgl = new Date(t.created_at).toLocaleString('id-ID',
       {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
     const jumlah = 'Rp ' + (t.jumlah || 25000).toLocaleString('id-ID');
+    const sourceBadge = t.status === 'pending_review'
+      ? '<span class="badge" style="background:#fef3c7;color:#92400e;">⚠️ Kartu kredit dicurigai — cek di dashboard Midtrans</span>'
+      : '<span class="badge" style="background:#f1f5f9;color:#475569;">Transfer manual</span>';
 
     return `<tr>
       <td style="font-family:monospace;font-size:.76rem;color:var(--text3);">${esc(t.order_id)}</td>
-      <td><strong>${esc(nama)}</strong></td>
+      <td><strong>${esc(nama)}</strong><br>${sourceBadge}</td>
       <td style="font-size:.81rem;color:var(--text2);">${esc(email)}</td>
       <td style="font-size:.79rem;color:var(--text3);">${tgl}</td>
       <td style="font-weight:700;color:var(--green);">${jumlah}</td>
