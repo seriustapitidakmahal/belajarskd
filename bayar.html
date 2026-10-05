@@ -106,7 +106,7 @@ h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.8rem;}
       </div>
       <div class="order-row">
         <span class="order-label">Jumlah Soal</span>
-        <span class="order-val">650 soal TWK+TIU+TKP</span>
+        <span class="order-val">1000 soal TWK+TIU+TKP</span>
       </div>
       <div class="order-row">
         <span class="order-label">Total Bayar</span>
@@ -117,7 +117,7 @@ h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.8rem;}
     <!-- Yang didapatkan -->
     <h3>🎁 Yang Kamu Dapatkan</h3>
     <div class="benefit-grid">
-      <div class="benefit-item">650 soal lengkap</div>
+      <div class="benefit-item">1000 soal lengkap</div>
       <div class="benefit-item">Soal figural SVG</div>
       <div class="benefit-item">Pembahasan detail</div>
       <div class="benefit-item">Soal diacak otomatis</div>
@@ -125,8 +125,27 @@ h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.8rem;}
       <div class="benefit-item">Multi-device</div>
     </div>
 
+    <!-- Bayar Otomatis (Midtrans) -->
+    <h3>⚡ Bayar Otomatis (Rekomendasi)</h3>
+    <div id="otomatisBox" style="background:var(--green-light);border:2px solid var(--green-mid);border-radius:var(--radius-sm);padding:1.2rem;margin-bottom:1.2rem;">
+      <div style="font-size:.85rem;color:#166534;margin-bottom:1rem;line-height:1.6;">
+        QRIS, GoPay, ShopeePay, atau Virtual Account — bayar sekali, <strong>akses langsung aktif otomatis</strong> dalam hitungan detik, tanpa menunggu verifikasi manual.
+      </div>
+      <button class="btn-confirm" id="btnBayarOtomatis" onclick="bayarOtomatis()" style="margin-bottom:0;">
+        ⚡ Bayar Rp25.000 Sekarang
+      </button>
+    </div>
+
+    <div id="menungguBox" style="display:none;background:var(--blue-light);border:2px solid #bfdbfe;border-radius:var(--radius-sm);padding:1.2rem;margin-bottom:1.2rem;text-align:center;">
+      <div class="spinner" style="border-top-color:var(--blue);border-color:rgba(37,99,235,.3);width:24px;height:24px;margin-bottom:.6rem;"></div>
+      <div style="font-size:.88rem;color:var(--blue);font-weight:600;">Menunggu konfirmasi pembayaran...</div>
+      <div style="font-size:.78rem;color:var(--text2);margin-top:4px;">Halaman ini akan otomatis lanjut begitu pembayaran terkonfirmasi.</div>
+    </div>
+
+    <div style="text-align:center;font-size:.78rem;color:var(--text3);margin-bottom:1.2rem;">— atau —</div>
+
     <!-- Transfer manual -->
-    <h3>💳 Cara Pembayaran</h3>
+    <h3>💳 Transfer Manual (Cadangan)</h3>
     <div class="transfer-box">
       <div class="transfer-title">🏦 Transfer ke salah satu rekening berikut:</div>
 
@@ -179,7 +198,7 @@ h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.8rem;}
       </div>
       <div class="step-item">
         <div class="step-num">4</div>
-        <div>Akses 650 soal langsung aktif dan <strong>email konfirmasi</strong> dikirim</div>
+        <div>Akses 1000 soal langsung aktif dan <strong>email konfirmasi</strong> dikirim</div>
       </div>
     </div>
 
@@ -207,16 +226,24 @@ h3{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.8rem;}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Midtrans Snap — SANDBOX dulu untuk uji coba. Nanti saat go-live, ganti
+     "app.sandbox.midtrans.com" jadi "app.midtrans.com" DAN ganti data-client-key
+     dengan Client Key PRODUCTION (bukan sandbox). -->
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="GANTI_DENGAN_SANDBOX_CLIENT_KEY_ANDA"></script>
 <script>
 const SUPABASE_URL = 'https://ivjdkylkvgutxyhuvxmj.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_VZ8NChOK61VKpNN3HcPPfA_OgkFdflC';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// GANTI dengan URL Edge Function "midtrans-create-transaction" Anda setelah deploy
+const MIDTRANS_CREATE_FN_URL = 'https://ivjdkylkvgutxyhuvxmj.supabase.co/functions/v1/smart-task';
 
 // ── Ganti dengan nomor rekening asli Anda ──
 // Cari teks "1234567890" dan "081234567890" di file ini
 // lalu ganti dengan nomor rekening dan nomor e-wallet Anda yang sebenarnya
 
 let currentUser = null;
+let currentSession = null;
 
 (async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -225,6 +252,7 @@ let currentUser = null;
     return;
   }
   currentUser = session.user;
+  currentSession = session;
 
   // Cek sudah premium? Langsung ke app
   const { data: profile } = await sb.from('profiles')
@@ -254,6 +282,71 @@ function copyText(text, btn) {
       btn.style.color = '';
     }, 2000);
   });
+}
+
+async function bayarOtomatis() {
+  const btn = document.getElementById('btnBayarOtomatis');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Menyiapkan pembayaran...';
+
+  try {
+    const res = await fetch(MIDTRANS_CREATE_FN_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + currentSession.access_token,
+      },
+    });
+    const out = await res.json();
+    if (!res.ok) throw new Error(out.error || 'Gagal menyiapkan pembayaran');
+
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Bayar Rp25.000 Sekarang';
+
+    window.snap.pay(out.token, {
+      onSuccess: function () { tungguKonfirmasi(out.order_id); },
+      onPending: function () { tungguKonfirmasi(out.order_id); },
+      onError: function () {
+        alert('Pembayaran gagal diproses. Silakan coba lagi atau pakai transfer manual.');
+      },
+      onClose: function () {
+        // User menutup popup tanpa menyelesaikan — tidak masalah, boleh coba lagi kapan saja
+      },
+    });
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Bayar Rp25.000 Sekarang';
+    alert('❌ ' + err.message);
+  }
+}
+
+function tungguKonfirmasi(orderId) {
+  document.getElementById('otomatisBox').style.display = 'none';
+  document.getElementById('menungguBox').style.display = 'block';
+
+  let attempts = 0;
+  const maxAttempts = 40; // ~2 menit (40 x 3 detik)
+
+  const poll = setInterval(async () => {
+    attempts++;
+    const { data: profile } = await sb.from('profiles')
+      .select('status_premium')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (profile && profile.status_premium) {
+      clearInterval(poll);
+      window.location.href = 'sukses.html?order=' + orderId;
+      return;
+    }
+
+    if (attempts >= maxAttempts) {
+      clearInterval(poll);
+      document.getElementById('menungguBox').innerHTML =
+        '<div style="font-size:.88rem;color:var(--text);font-weight:600;">⏳ Pembayaran masih diproses</div>' +
+        '<div style="font-size:.78rem;color:var(--text2);margin-top:4px;">Ini bisa makan waktu beberapa menit untuk beberapa metode. Silakan refresh halaman ini sesekali, akses akan aktif otomatis begitu selesai.</div>';
+    }
+  }, 3000);
 }
 
 async function konfirmasiTransfer() {
